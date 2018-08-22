@@ -14,7 +14,6 @@ Overview
         | |coveralls|
     * - package
       - | |version|
-        | |commits-since|
 
 .. |docs| image:: https://readthedocs.org/projects/py-deployer/badge/?style=flat
     :target: https://readthedocs.org/projects/py-deployer
@@ -35,10 +34,6 @@ Overview
 .. |coveralls| image:: https://coveralls.io/repos/jbenden/deployer/badge.svg?branch=master&service=github
     :alt: Coverage Status
     :target: https://coveralls.io/github/jbenden/deployer
-
-.. |commits-since| image:: https://img.shields.io/github/commits-since/jbenden/deployer/v0.1.0.svg
-    :alt: Commits since latest release
-    :target: https://github.com/jbenden/deployer/compare/v0.1.0...master
 
 .. end-badges
 
