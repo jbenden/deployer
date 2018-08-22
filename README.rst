@@ -13,7 +13,7 @@ Overview
       - | |travis| |appveyor| |requires|
         | |coveralls|
     * - package
-      - | |version| |wheel| |supported-versions| |supported-implementations|
+      - | |version|
         | |commits-since|
 
 .. |docs| image:: https://readthedocs.org/projects/py-deployer/badge/?style=flat
@@ -36,26 +36,9 @@ Overview
     :alt: Coverage Status
     :target: https://coveralls.io/github/jbenden/deployer
 
-.. |version| image:: https://img.shields.io/pypi/v/py-deployer.svg
-    :alt: PyPI Package latest release
-    :target: https://pypi.python.org/pypi/py-deployer
-
 .. |commits-since| image:: https://img.shields.io/github/commits-since/jbenden/deployer/v0.1.0.svg
     :alt: Commits since latest release
     :target: https://github.com/jbenden/deployer/compare/v0.1.0...master
-
-.. |wheel| image:: https://img.shields.io/pypi/wheel/py-deployer.svg
-    :alt: PyPI Wheel
-    :target: https://pypi.python.org/pypi/py-deployer
-
-.. |supported-versions| image:: https://img.shields.io/pypi/pyversions/py-deployer.svg
-    :alt: Supported versions
-    :target: https://pypi.python.org/pypi/py-deployer
-
-.. |supported-implementations| image:: https://img.shields.io/pypi/implementation/py-deployer.svg
-    :alt: Supported implementations
-    :target: https://pypi.python.org/pypi/py-deployer
-
 
 .. end-badges
 
