@@ -14,11 +14,49 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
+import logging
+import os
+import sys
+
 import click
+
+try:
+    import colorama
+    colorama.init(strip=True)
+except ImportError:
+    pass
+
+try:
+    import colorlog
+except ImportError:
+    pass
+
+
+def setup_logging():
+    """Initialize the logging infrastructure."""
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    format = '%(asctime)s - %(levelname)-8s - %(message)s'
+    date_format = '%Y-%m-%d %H:%M:%S'
+    if 'colorlog' in sys.modules and os.isatty(2):
+        cformat = '%(log_color)s' + format
+        f = colorlog.ColoredFormatter(cformat, date_format,
+                                      log_colors={'DEBUG': 'reset', 'INFO': 'reset',
+                                                  'WARNING': 'bold_yellow', 'ERROR': 'bold_red',
+                                                  'CRITICAL': 'bold_red'})
+    else:
+        f = logging.Formatter(format, date_format)
+    ch = logging.StreamHandler()
+    ch.setFormatter(f)
+    root.addHandler(ch)
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 @click.command()
 @click.argument('names', nargs=-1)
 def main(names):
     """Entry point."""
+    setup_logging()
     click.echo(repr(names))
