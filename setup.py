@@ -23,7 +23,7 @@ def read(*names, **kwargs):
 
 
 setup(
-    name='deployer',
+    name='py-deployer',
     version='0.1.0',
     license='Apache Software License 2.0',
     description='Local+CI+CD Made Easy!',
