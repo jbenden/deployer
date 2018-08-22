@@ -18,7 +18,7 @@ environment:
       PYTHON_ARCH: '32'
     - TOXENV: '2.7-cover'
       TOXPYTHON: C:\Python27-x64\python.exe
-      WINDOWS_SDK_VERSION: v7.0
+
       PYTHON_HOME: C:\Python27-x64
       PYTHON_VERSION: '2.7'
       PYTHON_ARCH: '64'
@@ -30,7 +30,7 @@ environment:
       PYTHON_ARCH: '32'
     - TOXENV: '2.7-nocov'
       TOXPYTHON: C:\Python27-x64\python.exe
-      WINDOWS_SDK_VERSION: v7.0
+
       PYTHON_HOME: C:\Python27-x64
       PYTHON_VERSION: '2.7'
       PYTHON_ARCH: '64'
@@ -42,6 +42,7 @@ environment:
       PYTHON_ARCH: '32'
     - TOXENV: '3.5-cover'
       TOXPYTHON: C:\Python35-x64\python.exe
+
       PYTHON_HOME: C:\Python35-x64
       PYTHON_VERSION: '3.5'
       PYTHON_ARCH: '64'
@@ -53,6 +54,7 @@ environment:
       PYTHON_ARCH: '32'
     - TOXENV: '3.5-nocov'
       TOXPYTHON: C:\Python35-x64\python.exe
+
       PYTHON_HOME: C:\Python35-x64
       PYTHON_VERSION: '3.5'
       PYTHON_ARCH: '64'
@@ -64,7 +66,7 @@ environment:
       PYTHON_ARCH: '32'
     - TOXENV: '3.6-cover'
       TOXPYTHON: C:\Python36-x64\python.exe
-      WINDOWS_SDK_VERSION: v7.1
+
       PYTHON_HOME: C:\Python36-x64
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '64'
@@ -76,7 +78,7 @@ environment:
       PYTHON_ARCH: '32'
     - TOXENV: '3.6-nocov'
       TOXPYTHON: C:\Python36-x64\python.exe
-      WINDOWS_SDK_VERSION: v7.1
+
       PYTHON_HOME: C:\Python36-x64
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '64'
