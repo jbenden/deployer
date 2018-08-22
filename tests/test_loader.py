@@ -4,6 +4,7 @@ from hamcrest import instance_of
 from six import StringIO
 
 from deployer import loader
+from deployer.plugins import TopLevel
 
 
 def test_top_level_is_a_list():
@@ -41,3 +42,14 @@ def test_top_level_is_an_ordered_list_of_dict():
     assert_that(document[1]['name'], equal_to('test2'))
     assert_that(document[2], instance_of(dict))
     assert_that(document[2]['name'], equal_to('test3'))
+
+
+def test_top_level_is_created():
+    stream = StringIO('''
+    - name: test1
+    - name: test2
+    - name: test3
+        ''')
+    document = loader.ordered_load(stream)
+    root = TopLevel(document)
+    assert_that(root.validate(), equal_to(True))
