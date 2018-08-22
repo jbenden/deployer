@@ -16,8 +16,8 @@ Overview
       - | |version| |wheel| |supported-versions| |supported-implementations|
         | |commits-since|
 
-.. |docs| image:: https://readthedocs.org/projects/deployer/badge/?style=flat
-    :target: https://readthedocs.org/projects/deployer
+.. |docs| image:: https://readthedocs.org/projects/py-deployer/badge/?style=flat
+    :target: https://readthedocs.org/projects/py-deployer
     :alt: Documentation Status
 
 .. |travis| image:: https://travis-ci.org/jbenden/deployer.svg?branch=master
@@ -73,7 +73,7 @@ Installation
 Documentation
 =============
 
-https://deployer.readthedocs.io/
+https://py-deployer.readthedocs.io/
 
 Development
 ===========
