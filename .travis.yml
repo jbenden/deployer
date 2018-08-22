@@ -12,38 +12,38 @@ matrix:
   include:
     - python: '2.7'
       env:
-        - TOXENV=2.7-cover,report,coveralls
+        - TOXENV=2.7-test-cover,report,coveralls
     - python: '2.7'
       env:
-        - TOXENV=2.7-nocov
+        - TOXENV=2.7-test-nocov
     - python: '3.5'
       env:
-        - TOXENV=3.5-cover,report,coveralls
+        - TOXENV=3.5-test-cover,report,coveralls
     - python: '3.5'
       env:
-        - TOXENV=3.5-nocov
+        - TOXENV=3.5-test-nocov
     - python: '3.6'
       env:
-        - TOXENV=3.6-cover,report,coveralls
+        - TOXENV=3.6-test-cover,report,coveralls
     - python: '3.6'
       env:
-        - TOXENV=3.6-nocov
+        - TOXENV=3.6-test-nocov
     - python: '3.7'
       dist: xenial
       sudo: true
       env:
-        - TOXENV=3.7-cover,report,coveralls
+        - TOXENV=3.7-test-cover,report,coveralls
     - python: '3.7'
       dist: xenial
       sudo: true
       env:
-        - TOXENV=3.7-nocov
+        - TOXENV=3.7-test-nocov
     - python: 'pypy-5.4'
       env:
-        - TOXENV=pypy-cover,report,coveralls
+        - TOXENV=pypy-test-cover,report,coveralls
     - python: 'pypy-5.4'
       env:
-        - TOXENV=pypy-nocov
+        - TOXENV=pypy-test-nocov
 before_install:
   - python --version
   - uname -a
