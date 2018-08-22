@@ -68,6 +68,7 @@ setup(
         'click',
         'colorama;platform_system=="Windows"',
         'colorlog',
+        'pluggy',
         'pyaml',
         'schema',
         'six',
