@@ -11,7 +11,7 @@ environment:
       PYTHON_HOME: C:\Python27
       PYTHON_VERSION: '2.7'
       PYTHON_ARCH: '32'
-{% for env, config in tox_environments|dictsort %}{{ '' }}{% if config.python.startswith('python') %}
+{% for env, config in tox_environments|dictsort %}{{ '' }}{% if config.python.startswith('python') %}{% if config.python != "python3.7" %}
     - TOXENV: '{{ env }}'
       TOXPYTHON: C:\{{ config.python.replace('.', '').capitalize() }}\python.exe
       PYTHON_HOME: C:\{{ config.python.replace('.', '').capitalize() }}
@@ -24,7 +24,7 @@ environment:
       PYTHON_VERSION: '{{ config.python[-3:] }}'
       PYTHON_ARCH: '64'
 
-{% endif %}{% endfor %}
+{% endif %}{% endif %}{% endfor %}
 init:
   - ps: echo $env:TOXENV
   - ps: ls C:\Python*
