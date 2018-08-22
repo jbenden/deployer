@@ -73,7 +73,7 @@ Installation
 Documentation
 =============
 
-https://py-deployer.readthedocs.io/
+https://py-deployer.readthedocs.io/en/latest/
 
 Development
 ===========
