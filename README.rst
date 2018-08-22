@@ -12,8 +12,6 @@ Overview
     * - tests
       - | |travis| |appveyor| |requires|
         | |coveralls|
-    * - package
-      - | |version|
 
 .. |docs| image:: https://readthedocs.org/projects/py-deployer/badge/?style=flat
     :target: https://readthedocs.org/projects/py-deployer
