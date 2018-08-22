@@ -1,0 +1,53 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary project-path
+#
+# See:
+#    https://pypi.python.org/pypi/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=project-path/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+
+    _template:                 'gh:ionelmc/cookiecutter-pylibrary'
+    appveyor:                  'yes'
+    c_extension_function:      'longest'
+    c_extension_module:        '_deployer'
+    c_extension_optional:      'no'
+    c_extension_support:       'no'
+    codacy:                    'no'
+    codeclimate:               'no'
+    codecov:                   'no'
+    command_line_interface:    'click'
+    command_line_interface_bin_name: 'deployer'
+    coveralls:                 'yes'
+    distribution_name:         'deployer'
+    email:                     'joe@benden.us'
+    full_name:                 'Joseph Benden'
+    github_username:           'jbenden'
+    landscape:                 'no'
+    license:                   'Apache Software License 2.0'
+    linter:                    'flake8'
+    package_name:              'deployer'
+    project_name:              'Deployer'
+    project_short_description: 'Local+CI+CD Made Easy!'
+    release_date:              'today'
+    repo_name:                 'deployer'
+    requiresio:                'yes'
+    scrutinizer:               'no'
+    sphinx_doctest:            'no'
+    sphinx_theme:              'sphinx-rtd-theme'
+    test_matrix_configurator:  'yes'
+    test_matrix_separate_coverage: 'yes'
+    test_runner:               'pytest'
+    travis:                    'yes'
+    version:                   '0.1.0'
+    website:                   'https://benden.us'
+    year:                      'now'
