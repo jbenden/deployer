@@ -66,6 +66,8 @@ setup(
     ],
     install_requires=[
         'click',
+        'Twisted[windows_platform];platform_system=="Windows"',
+        'Twisted;platform_system!="Windows"',
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
     ],
     extras_require={
