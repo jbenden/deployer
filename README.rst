@@ -34,7 +34,7 @@ Overview
 
 .. |coveralls| image:: https://coveralls.io/repos/jbenden/deployer/badge.svg?branch=master&service=github
     :alt: Coverage Status
-    :target: https://coveralls.io/r/jbenden/deployer
+    :target: https://coveralls.io/github/jbenden/deployer
 
 .. |version| image:: https://img.shields.io/pypi/v/py-deployer.svg
     :alt: PyPI Package latest release
