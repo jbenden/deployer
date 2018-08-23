@@ -22,9 +22,12 @@ The module plug-in providing the ``echo`` command.
 :license: Apache License 2.0, see LICENSE.txt for full details.
 """
 
+import logging
 from collections import OrderedDict
 
 from .plugin import Plugin
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Echo(Plugin):
@@ -55,4 +58,5 @@ class Echo(Plugin):
 
     def execute(self):
         """Perform the plugin's task purpose."""
-        print(self.msg)
+        LOGGER.info("| %s", self.msg)
+        return 'success'

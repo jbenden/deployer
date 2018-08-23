@@ -63,12 +63,12 @@ def test_plugin_echo_build():
     assert_that(calling(next).with_args(subject), raises(StopIteration))
 
 
-def test_plugin_echo_works(capsys):
+def test_plugin_echo_works(caplog):
     # NOTE: because no toplevel is called, we do NOT proxy!
     subject = next(Echo.build(OrderedDict({'echo': 'Testing'})))
     subject.execute()
-    captured = capsys.readouterr()
-    assert_that(captured.out, starts_with("Testing"))
+    assert_that(len(caplog.records), equal_to(1))
+    assert_that(caplog.records[0].message, equal_to("| Testing"))
 
 
 def test_plugin_top_level_produces_logging(caplog):
@@ -88,8 +88,8 @@ def test_plugin_top_level_produces_logging(caplog):
         assert_that(node, instance_of(Echo))
         node.execute()
 
-        assert_that(len(caplog.records), equal_to(2))
+        assert_that(len(caplog.records), equal_to(3))
         assert_that(caplog.records[0].message, starts_with("test%d is starting" % index))
-        assert_that(caplog.records[1].message, starts_with("test%d has finished" % index))
+        assert_that(caplog.records[2].message, starts_with("test%d has finished" % index))
 
         caplog.clear()
