@@ -24,10 +24,36 @@ The top-level object, representing an entire ```PyDeployer``` pipeline.
 
 import logging
 
+from schema import SchemaWrongKeyError
+
 from .plugin import Plugin
 from .plugin_proxy import PluginProxy
 
 LOGGER = logging.getLogger(__name__)
+
+
+class InvalidNode(RuntimeError):
+    """Exception thrown when a YAML section cannot be handled via all plug-ins."""
+
+    def __init__(self, node):
+        """Ctor."""
+        self.node = node
+
+    def __str__(self):
+        """Get a string representation of this exception."""
+        return "All available plug-ins are unable to handle the '%r' expression." % self.node    # noqa: no-cover
+
+
+class FailedValidation(RuntimeError):
+    """Exception thrown when a YAML section cannot be correctly validated by a plug-in."""
+
+    def __init__(self, node):
+        """Ctor."""
+        self.node = node
+
+    def __str__(self):
+        """Get a string representation of this exception."""
+        return "Failed to validate expression:\n\n%r" % self.node                                # noqa: no-cover
 
 
 class TopLevel(Plugin):
@@ -44,15 +70,17 @@ class TopLevel(Plugin):
     @staticmethod
     def build(document):
         """Produce an iterable AST representation of a YAML pipeline definition."""
-        if TopLevel.valid(document):
-            for node in document:
-                # find a workable plugin
-                plugin = Plugin._find_matching_plugin_for_node(node)
-                if plugin:
+        for node in document:
+            # find a workable plugin
+            plugin = Plugin._find_matching_plugin_for_node(node)
+            if plugin:
+                try:
                     if plugin.valid(node):
                         for sub_node in plugin.build(node):
                             yield PluginProxy(sub_node)
                     else:
-                        raise RuntimeError("Failed validation: %r" % node)
-                else:
-                    raise RuntimeError("Could not handle node: %r" % node)
+                        raise FailedValidation(node)
+                except SchemaWrongKeyError:
+                    raise FailedValidation(node)
+            else:
+                raise InvalidNode(node)
