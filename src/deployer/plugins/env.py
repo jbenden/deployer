@@ -84,8 +84,8 @@ class Env(Plugin):
                     LOGGER.debug("Removing '%s' from system environment.", env)
                     try:
                         os.unsetenv(env)
-                    except AttributeError:
-                        pass
+                    except AttributeError:                               # noqa: no-cover
+                        pass                                             # noqa: no-cover
                     del os.environ[env]
                 else:
                     LOGGER.debug("Keeping '%s' present in the system environment.", env)

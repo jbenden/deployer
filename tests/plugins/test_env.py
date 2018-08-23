@@ -40,8 +40,8 @@ def capenv(request):
     for key, value in os.environ.copy().items():
         try:
             os.unsetenv(key)
-        except AttributeError:
-            pass
+        except AttributeError:                                           # noqa: no-cover
+            pass                                                         # noqa: no-cover
         del os.environ[key]
     for key, value in prev_env.items():
         os.putenv(key, value)
