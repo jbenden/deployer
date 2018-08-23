@@ -69,6 +69,8 @@ def setup_logging():
         f = logging.Formatter(format, date_format)
     ch = logging.StreamHandler()
     ch.setFormatter(f)
+    while root.handlers:
+        root.handlers.pop()
     root.addHandler(ch)
 
 
