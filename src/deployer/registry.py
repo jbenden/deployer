@@ -55,8 +55,8 @@ class Registry(object):
 
     def register_plugin(self, name, cls):
         """Register the `cls` for handling pipeline nodes, utilizing `name`."""
-        if not getattr(cls, 'TAG'):
-            raise LookupError("All plug-ins must implement a TAG attribute.")
+        if not getattr(cls, 'TAG'):                                                # noqa: no-cover
+            raise LookupError("All plug-ins must implement a TAG attribute.")      # noqa: no-cover
 
         LOGGER.debug('Registering %s, with class %s, as a plug-in.', name, cls.__name__)
         self._plugins.update([(name, cls)])
