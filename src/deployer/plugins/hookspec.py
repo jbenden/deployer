@@ -30,5 +30,5 @@ hookspec = HookspecMarker("deployer")
 
 
 @hookspec
-def deployer_register(registry):
-    """Hook to perform a plug-in's registration."""
+def deployer_register(registry):  # noqa: D401
+    """A hook available for a plug-in to perform its' registration."""
