@@ -99,3 +99,22 @@ def test_plugin_env_set_one(capenv):
         node.execute()
 
     assert_that('Joe' in os.environ, equal_to(True))
+
+
+def test_plugin_env_unset_filter(capenv):
+    stream = StringIO('''
+    - name: test1
+      env:
+        unset: 'J*'
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    os.environ['Joe'] = '123'
+    os.putenv('Joe', '123')
+
+    for node in nodes:
+        node.execute()
+
+    assert_that(os.getenv('Joe', None), equal_to(None))
