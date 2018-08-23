@@ -9,6 +9,12 @@ source =
 parallel = true
 
 [report]
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Custom
+    noqa: no-cover
 show_missing = true
 precision = 2
 omit = *migrations*

@@ -41,18 +41,16 @@ from deployer import plugins as builtin_plugins
 from deployer.plugins import hookspec as hookspecs
 from deployer.registry import Registry
 
-# noqa: no-cover
 try:
-    import colorama
-    colorama.init(strip=True)
-except ImportError:
-    pass
+    import colorama                                            # noqa: no-cover
+    colorama.init(strip=True)                                  # noqa: no-cover
+except ImportError:                                            # noqa: no-cover
+    pass                                                       # noqa: no-cover
 
-# noqa: no-cover
 try:
-    import colorlog
-except ImportError:
-    pass
+    import colorlog                                            # noqa: no-cover
+except ImportError:                                            # noqa: no-cover
+    pass                                                       # noqa: no-cover
 
 
 def setup_logging():

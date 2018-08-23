@@ -8,5 +8,5 @@ Why does this file exist, and why __main__? For more info, read:
 """
 from deployer.cli import main
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__":                                     # noqa: no-cover
+    main()                                                     # noqa: no-cover
