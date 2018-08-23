@@ -64,6 +64,7 @@ def test_plugin_echo_build():
 
 
 def test_plugin_echo_works(capsys):
+    # NOTE: because no toplevel is called, we do NOT proxy!
     subject = next(Echo.build(OrderedDict({'echo': 'Testing'})))
     subject.execute()
     captured = capsys.readouterr()
