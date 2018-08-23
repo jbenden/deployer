@@ -34,13 +34,21 @@ import os
 import sys
 
 import click
+import pluggy
+import six
 
+from deployer import plugins as builtin_plugins
+from deployer.plugins import hookspec as hookspecs
+from deployer.registry import Registry
+
+# noqa: no-cover
 try:
     import colorama
     colorama.init(strip=True)
 except ImportError:
     pass
 
+# noqa: no-cover
 try:
     import colorlog
 except ImportError:
@@ -66,12 +74,40 @@ def setup_logging():
     root.addHandler(ch)
 
 
+def _get_plugin_manager(plugins=()):
+    pm = pluggy.PluginManager('deployer')
+    pm.add_hookspecs(hookspecs)
+    pm.register(sys.modules[__name__])
+    pm.register(builtin_plugins)
+    pm.load_setuptools_entrypoints('py-deployer')
+    for plugin in plugins:
+        if isinstance(plugin, six.string_types):
+            __import__(plugin)
+            try:
+                pm.register(sys.modules[plugin])
+            except KeyError:
+                print('The %s plugin was requested to load and register; but failed to import!' % plugin)
+                sys.exit(1)
+        else:
+            pm.register(plugin)
+    pm.check_pending()
+
+    return pm
+
+
 LOGGER = logging.getLogger(__name__)
+
+
+def initialize():
+    """Perform basic initialization of program."""
+    setup_logging()
+    Registry.plugin_manager = _get_plugin_manager()
+    Registry.plugin_manager.hook.deployer_register(registry=Registry())
 
 
 @click.command()
 @click.argument('names', nargs=-1)
 def main(names):
     """Entry point."""
-    setup_logging()
+    initialize()
     click.echo(repr(names))

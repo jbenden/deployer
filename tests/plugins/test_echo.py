@@ -13,9 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import OrderedDict
+
 from hamcrest import assert_that
+from hamcrest import calling
 from hamcrest import equal_to
 from hamcrest import instance_of
+from hamcrest import raises
 from hamcrest import starts_with
 from six import StringIO
 
@@ -25,44 +29,7 @@ from deployer.plugins import TopLevel
 from deployer.plugins.echo import Echo
 
 
-def test_top_level_is_a_list():
-    stream = StringIO('''
-- name: test1
-- name: test2
-- name: test3
-    ''')
-    document = loader.ordered_load(stream)
-    assert_that(document, instance_of(list))
-
-
-def test_top_level_is_a_list_with_dict():
-    stream = StringIO('''
-- name: test1
-- name: test2
-- name: test3
-    ''')
-    document = loader.ordered_load(stream)
-    assert_that(document, instance_of(list))
-    assert_that(document[0], instance_of(dict))
-
-
-def test_top_level_is_an_ordered_list_of_dict():
-    stream = StringIO('''
-- name: test1
-- name: test2
-- name: test3
-    ''')
-    document = loader.ordered_load(stream)
-    assert_that(document, instance_of(list))
-    assert_that(document[0], instance_of(dict))
-    assert_that(document[0]['name'], equal_to('test1'))
-    assert_that(document[1], instance_of(dict))
-    assert_that(document[1]['name'], equal_to('test2'))
-    assert_that(document[2], instance_of(dict))
-    assert_that(document[2]['name'], equal_to('test3'))
-
-
-def test_top_level_is_created():
+def test_plugin_top_level_is_created():
     initialize()
     stream = StringIO('''
     - name: test1
@@ -79,3 +46,25 @@ def test_top_level_is_created():
     for node in nodes:
         assert_that(node, instance_of(Echo))
         assert_that(node.msg, starts_with("hi"))
+
+
+def test_plugin_echo_invalid():
+    assert_that(Echo.valid({}), equal_to(False))
+    assert_that(Echo.valid(None), equal_to(False))
+    assert_that(Echo.valid(OrderedDict({'a': 'abc'})), equal_to(False))
+
+
+def test_plugin_echo_valid():
+    assert_that(Echo.valid(OrderedDict({'echo': 'Testing'})), equal_to(True))
+
+
+def test_plugin_echo_build():
+    subject = Echo.build({'echo': 'Testing'})
+    assert_that(calling(next).with_args(subject), raises(StopIteration))
+
+
+def test_plugin_echo_works(capsys):
+    subject = next(Echo.build(OrderedDict({'echo': 'Testing'})))
+    subject.execute()
+    captured = capsys.readouterr()
+    assert_that(captured.out, starts_with("Testing"))

@@ -13,16 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Namespace for all built-in plugins shipped with ```PyDeployer```."""
+# pylint: disable=C0103,W0613
 
-# flake8: noqa
+"""
+Hook specifications for ``PyDeployer```.
 
-from .api import hookimpl
-from .echo import Echo
-from .top_level import TopLevel
+.. moduleauthor:: Joseph Benden <joe@benden.us>
+
+:copyright: (c) Copyright 2018 by Joseph Benden.
+:license: Apache License 2.0, see LICENSE for full details.
+"""
+
+from pluggy import HookspecMarker
+
+hookspec = HookspecMarker("deployer")
 
 
-@hookimpl
+@hookspec
 def deployer_register(registry):
-    """Perform built-in plug-in registrations."""
-    registry.register_plugin('echo', Echo)
+    """Hook to perform a plug-in's registration."""

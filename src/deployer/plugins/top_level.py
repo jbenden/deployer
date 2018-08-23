@@ -24,17 +24,34 @@ The top-level object, representing an entire ```PyDeployer``` pipeline.
 
 import logging
 
+from .plugin import Plugin
 
-class TopLevel:
+LOGGER = logging.getLogger(__name__)
+
+
+class TopLevel(Plugin):
     """The very top most object of a whole pipeline."""
 
-    def __init__(self, document):
-        """Ctor."""
-        self.document = document
-
-    def validate(self):
-        """Ensure document structure is valid (recursively)."""
-        if type(self.document) is not list:
+    @staticmethod
+    def valid(node):
+        """Ensure the top-level node structure is valid."""
+        if type(node) is not list:
             return False
 
         return True
+
+    @staticmethod
+    def build(document):
+        """Produce an iterable AST representation of a YAML pipeline definition."""
+        if TopLevel.valid(document):
+            for node in document:
+                # find a workable plugin
+                plugin = Plugin._find_matching_plugin_for_node(node)
+                if plugin:
+                    if plugin.valid(node):
+                        for sub_node in plugin.build(node):
+                            yield sub_node
+                    else:
+                        raise RuntimeError("Failed validation: %r" % node)
+                else:
+                    raise RuntimeError("Could not handle node: %r" % node)
