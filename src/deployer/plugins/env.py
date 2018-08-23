@@ -50,7 +50,14 @@ class Env(Plugin):
     def __init__(self, node):
         """Ctor."""
         self.env_set = node['set'] if 'set' in node else {}
-        self.env_unset = node['unset'] if 'unset' in node else {}
+
+        if 'unset' in node:
+            if type(node['unset']) not in (list,):
+                self.env_unset = [node['unset']]
+            else:
+                self.env_unset = node['unset']
+        else:
+            self.env_unset = []
 
     @staticmethod
     def valid(node):
