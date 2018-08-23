@@ -14,13 +14,17 @@
 # limitations under the License.
 
 import os
+from collections import OrderedDict
 
 import pytest
 from hamcrest import assert_that
+from hamcrest import calling
 from hamcrest import equal_to
+from hamcrest import raises
 from six import StringIO
 
 from deployer import loader
+from deployer.plugins import Env
 from deployer.plugins import TopLevel
 
 
@@ -39,6 +43,17 @@ def capenv(request):
     for key, value in prev_env.items():
         os.putenv(key, value)
         os.environ[key] = value
+
+
+def test_plugin_env_invalid():
+    assert_that(Env.valid({}), equal_to(False))
+    assert_that(Env.valid(None), equal_to(False))
+    assert_that(Env.valid(OrderedDict({'a': 'abc'})), equal_to(False))
+
+
+def test_plugin_env_build():
+    subject = Env.build({'env': {'set': {'a': '12345'}}})
+    assert_that(calling(next).with_args(subject), raises(StopIteration))
 
 
 def test_plugin_env_unset_all_and_adds_one_via_list(capenv):
