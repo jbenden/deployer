@@ -19,6 +19,7 @@
 
 from .api import hookimpl
 from .echo import Echo
+from .env import Env
 from .top_level import TopLevel
 
 
@@ -26,3 +27,4 @@ from .top_level import TopLevel
 def deployer_register(registry):
     """Perform built-in plug-in registrations."""
     registry.register_plugin('echo', Echo)
+    registry.register_plugin('env', Env)
