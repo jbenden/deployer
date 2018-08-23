@@ -25,6 +25,7 @@ The top-level object, representing an entire ```PyDeployer``` pipeline.
 import logging
 
 from .plugin import Plugin
+from .plugin_proxy import PluginProxy
 
 LOGGER = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ class TopLevel(Plugin):
                 if plugin:
                     if plugin.valid(node):
                         for sub_node in plugin.build(node):
-                            yield sub_node
+                            yield PluginProxy(sub_node)
                     else:
                         raise RuntimeError("Failed validation: %r" % node)
                 else:
