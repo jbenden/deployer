@@ -33,18 +33,18 @@ LOGGER = logging.getLogger(__name__)
 class PluginProxy(Proxy):
     """Wrap-around for all plug-ins."""
 
-    def __init__(self, obj):
+    def __init__(self, name, obj):
         """Ctor."""
         super(PluginProxy, self).__init__(obj)
+        self._name = name
 
     def execute(self):
         """Proxy of a plug-in's `execute` method."""
-        tag = object.__getattribute__(self, "_obj").TAG
-        LOGGER.info("%s is starting.", tag)
+        LOGGER.info("%s is starting.", self._name)
         # emit a start event here, events MUST have correlation id
         start = time.time()
         result = object.__getattribute__(self, "_obj").execute()
         end = time.time()
-        LOGGER.info("%s has finished with %r, in %0.9f seconds.", tag, result, (end - start))
+        LOGGER.info("%s has finished with %r, in %0.9f seconds.", self._name, result, (end - start))
         # emit an end event here
         return result

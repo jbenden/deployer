@@ -73,23 +73,23 @@ def test_plugin_echo_works(capsys):
 
 def test_plugin_top_level_produces_logging(caplog):
     stream = StringIO('''
-    - name: test1
+    - name: test0
       echo: hi1
-    - name: test2
+    - name: test1
       echo: hi2
-    - name: test3
+    - name: test2
       echo: hi3
     ''')
     document = loader.ordered_load(stream)
 
     nodes = TopLevel.build(document)
 
-    for node in nodes:
+    for index, node in enumerate(nodes):
         assert_that(node, instance_of(Echo))
         node.execute()
 
         assert_that(len(caplog.records), equal_to(2))
-        assert_that(caplog.records[0].message, starts_with("echo is starting"))
-        assert_that(caplog.records[1].message, starts_with("echo has finished"))
+        assert_that(caplog.records[0].message, starts_with("test%d is starting" % index))
+        assert_that(caplog.records[1].message, starts_with("test%d has finished" % index))
 
         caplog.clear()

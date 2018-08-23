@@ -76,8 +76,10 @@ class TopLevel(Plugin):
             if plugin:
                 try:
                     if plugin.valid(node):
+                        # handle common elements
+                        name = node['name'] if 'name' in node else plugin.TAG
                         for sub_node in plugin.build(node):
-                            yield PluginProxy(sub_node)
+                            yield PluginProxy(name, sub_node)
                     else:
                         raise FailedValidation(node)
                 except SchemaWrongKeyError:
