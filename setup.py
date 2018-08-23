@@ -86,4 +86,7 @@ setup(
             'deployer = deployer.cli:main',
         ]
     },
+    tests_require=[
+        'pytest',
+    ],
 )
