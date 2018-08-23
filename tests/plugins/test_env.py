@@ -38,7 +38,10 @@ def capenv(request):
 
     # restore environment
     for key, value in os.environ.copy().items():
-        os.unsetenv(key)
+        try:
+            os.unsetenv(key)
+        except AttributeError:
+            pass
         del os.environ[key]
     for key, value in prev_env.items():
         os.putenv(key, value)

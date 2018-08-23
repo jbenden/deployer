@@ -82,7 +82,10 @@ class Env(Plugin):
             for pattern in self.env_unset:
                 if fnmatch.fnmatchcase(env, pattern):
                     LOGGER.debug("Removing '%s' from system environment.", env)
-                    os.unsetenv(env)
+                    try:
+                        os.unsetenv(env)
+                    except AttributeError:
+                        pass
                     del os.environ[env]
                 else:
                     LOGGER.debug("Keeping '%s' present in the system environment.", env)
