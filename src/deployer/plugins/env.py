@@ -93,3 +93,4 @@ class Env(Plugin):
             LOGGER.debug("Setting '%s' to '%s', in the system environment.", key, value)
             os.putenv(key, value)
             os.environ[key] = value
+        return 'success'
