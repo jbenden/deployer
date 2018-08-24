@@ -92,7 +92,14 @@ class Matrix(Plugin):
         result = 'success'
         for tag in self._tags:
             if context:
-                context.variables.push(context.variables.last())
+                context.variables.push_last()
+                # set the current matrix tag variable
+                # matrix_tag == m1
+                context.variables.last()['matrix_tag'] = tag
+                # matrix_list == [m1, m2]
+                if 'matrix_list' not in context.variables.last():
+                    context.variables.last()['matrix_list'] = []
+                context.variables.last()['matrix_list'].append(tag)
             LOGGER.debug('Beginning matrix entry: %s', tag)
             result = self._execute_tasks(context)
             LOGGER.debug('Completed matrix entry: %s', tag)

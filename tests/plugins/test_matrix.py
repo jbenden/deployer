@@ -18,11 +18,13 @@ from collections import OrderedDict
 from hamcrest import assert_that
 from hamcrest import contains_string
 from hamcrest import equal_to
+from hamcrest import has_entry
 from hamcrest import instance_of
 from six import StringIO
 
 from deployer import loader
 from deployer.cli import initialize
+from deployer.context import Context
 from deployer.plugins import Matrix
 from deployer.plugins import TopLevel
 
@@ -108,3 +110,75 @@ def test_plugin_matrix_runs_with_two_elements(caplog):
     assert_that(caplog.text, contains_string('entry: m1'))
     assert_that(caplog.text, contains_string('entry: m2'))
     assert_that(caplog.text, contains_string('Hello world.'))
+
+
+def test_plugin_matrix_runs_with_two_elements_and_contains_tags(caplog):
+    stream = StringIO('''
+    - name: test1
+      matrix:
+        tags:
+          - m1
+          - m2
+        tasks:
+          - name: Testing task
+            echo: Hello world.
+    ''')
+    document = loader.ordered_load(stream)
+
+    assert_that(TopLevel.valid(document), equal_to(True))
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+        assert_that(context.variables.last(), not has_entry('matrix_tag', 'm2'))
+        assert_that(context.variables.last(), not has_entry('matrix_list', ['m2']))
+
+    assert_that(caplog.text, contains_string('entry: m1'))
+    assert_that(caplog.text, contains_string('entry: m2'))
+    assert_that(caplog.text, contains_string('Hello world.'))
+
+    assert_that(context.variables.last(), not has_entry('matrix_tag', 'm2'))
+    assert_that(context.variables.last(), not has_entry('matrix_list', ['m2']))
+
+
+def test_plugin_matrix_runs_with_two_matrices_and_contains_tags(caplog):
+    stream = StringIO('''
+    - name: test1
+      matrix:
+        tags:
+          - m1
+          - m2
+        tasks:
+          - name: test2
+            matrix:
+              tags:
+                - m3
+              tasks:
+                - name: Testing task
+                  echo: Hello world.
+    ''')
+    document = loader.ordered_load(stream)
+
+    assert_that(TopLevel.valid(document), equal_to(True))
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+        assert_that(context.variables.last(), not has_entry('matrix_tag', 'm2'))
+        assert_that(context.variables.last(), not has_entry('matrix_list', ['m2']))
+
+    assert_that(caplog.text, contains_string('entry: m1'))
+    assert_that(caplog.text, contains_string('entry: m2'))
+    assert_that(caplog.text, contains_string('entry: m3'))
+    assert_that(caplog.text, contains_string('Hello world.'))
+
+    assert_that(context.variables.last(), not has_entry('matrix_tag', 'm2'))
+    assert_that(context.variables.last(), not has_entry('matrix_list', ['m2']))

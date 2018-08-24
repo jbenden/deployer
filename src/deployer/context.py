@@ -51,6 +51,14 @@ class Stack:
         """Return the right-most element on the stack."""
         return self.__storage[-1]
 
+    def __len__(self):
+        """Return the number of elements on the stack."""
+        return len(self.__storage)
+
+    def push_last(self):
+        """Re-push the last item on to the stack."""
+        self.__storage.append(self.last().copy())
+
 
 class Context:
     """Data container for pipeline state."""
