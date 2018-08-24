@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import os
+import platform
 from collections import OrderedDict
 
 import pytest
@@ -23,6 +24,7 @@ from hamcrest import instance_of
 from six import StringIO
 
 from deployer import loader
+from deployer.context import Context
 from deployer.plugins import Env
 from deployer.plugins import TopLevel
 
@@ -135,3 +137,22 @@ def test_plugin_env_unset_filter(capenv):
         node.execute(None)
 
     assert_that(os.getenv('Joe', None), equal_to(None))
+
+
+def test_plugin_echo_renders_node(capenv):
+    stream = StringIO('''
+    - name: test0
+      env:
+        set:
+          "Joe": "{{ node }}"
+    ''')
+    document = loader.ordered_load(stream)
+
+    node = next(TopLevel.build(document))
+
+    context = Context()
+
+    assert_that(node, instance_of(Env))
+    node.execute(context)
+
+    assert_that(os.getenv('Joe', None), equal_to(platform.node()))

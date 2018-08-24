@@ -33,6 +33,8 @@ from schema import Or
 from schema import Schema
 from schema import SchemaError
 
+from deployer.rendering import render
+
 from .plugin import Plugin
 
 LOGGER = logging.getLogger(__name__)
@@ -95,6 +97,9 @@ class Env(Plugin):
                 else:
                     LOGGER.debug("Keeping '%s' present in the system environment.", env)
         for key, value in self.env_set.items():
+            if context:
+                value = render(value, **context.variables.last())
+
             LOGGER.debug("Setting '%s' to '%s', in the system environment.", key, value)
             os.putenv(key, value)
             os.environ[key] = value
