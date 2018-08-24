@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from hamcrest import assert_that
 from hamcrest import calling
 from hamcrest import equal_to
@@ -20,6 +22,7 @@ from hamcrest import raises
 from jinja2.exceptions import TemplateSyntaxError
 from jinja2.exceptions import UndefinedError
 
+from deployer.context import Context
 from deployer.rendering import render
 
 
@@ -110,3 +113,11 @@ def test_rendering_raw_two_indirections():
     subject = render(fixture, a="{{ b }}", b="{{ c }}", c="{% raw %}Hello World{% endraw %}")
 
     assert_that(subject, equal_to("Hello World."))
+
+
+def test_rendering_simple_context():
+    context = Context()
+    fixture = """{{ platform }}"""
+    subject = render(fixture, **context.variables.last())
+
+    assert_that(subject, equal_to(sys.platform.lower()))
