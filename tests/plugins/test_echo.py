@@ -13,9 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import platform
 from collections import OrderedDict
 
 from hamcrest import assert_that
+from hamcrest import contains_string
 from hamcrest import equal_to
 from hamcrest import instance_of
 from hamcrest import starts_with
@@ -23,9 +25,11 @@ from six import StringIO
 
 from deployer import loader
 from deployer.cli import initialize
+from deployer.context import Context
 from deployer.plugins import Fail
 from deployer.plugins import TopLevel
 from deployer.plugins.echo import Echo
+from deployer.plugins.matrix import Matrix
 
 
 def test_plugin_fail_invalid():
@@ -98,3 +102,57 @@ def test_plugin_top_level_produces_logging(caplog):
         assert_that(caplog.records[2].message, starts_with("test%d has finished" % index))
 
         caplog.clear()
+
+
+def test_plugin_echo_renders_node(caplog):
+    stream = StringIO('''
+    - name: test0
+      echo: "{{ node }}"
+    - name: test1
+      echo: "{{ node }}"
+    - name: test2
+      echo: "{{ node }}"
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for index, node in enumerate(nodes):
+        assert_that(node, instance_of(Echo))
+        node.execute(context)
+
+        assert_that(len(caplog.records), equal_to(3))
+        assert_that(caplog.records[0].message, starts_with("test%d is starting" % index))
+        assert_that(caplog.records[1].message, starts_with("| %s" % platform.node()))
+        assert_that(caplog.records[2].message, starts_with("test%d has finished" % index))
+
+        caplog.clear()
+
+
+def test_plugin_matrix_renders_node(caplog):
+    stream = StringIO('''
+    - name: A simple test
+      matrix:
+        tags:
+          - m1
+        tasks:
+          - name: test0
+            echo: "{{ node }}"
+          - name: test1
+            echo: "{{ node }}"
+          - name: test2
+            echo: "{{ node }}"
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    m1 = next(nodes)
+    assert_that(m1, instance_of(Matrix))
+    m1.execute(context)
+
+    assert_that(caplog.text, contains_string("| %s" % platform.node()))

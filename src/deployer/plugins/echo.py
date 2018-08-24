@@ -25,6 +25,8 @@ The module plug-in providing the ``echo`` command.
 import logging
 from collections import OrderedDict
 
+from deployer.rendering import render
+
 from .plugin import Plugin
 
 LOGGER = logging.getLogger(__name__)
@@ -57,5 +59,10 @@ class Echo(Plugin):
 
     def execute(self, context):
         """Perform the plugin's task purpose."""
-        LOGGER.info("| %s", self.msg)
+        if context:
+            msg = render(self.msg, **context.variables.last())
+        else:
+            msg = self.msg
+
+        LOGGER.info("| %s", msg)
         return 'success'
