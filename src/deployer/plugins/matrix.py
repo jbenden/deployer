@@ -91,9 +91,13 @@ class Matrix(Plugin):
         """Perform the plugin's task purpose."""
         result = 'success'
         for tag in self._tags:
+            if context:
+                context.variables.push(context.variables.last())
             LOGGER.debug('Beginning matrix entry: %s', tag)
             result = self._execute_tasks(context)
             LOGGER.debug('Completed matrix entry: %s', tag)
+            if context:
+                context.variables.pop()
             if not result == 'success':
                 break
 
