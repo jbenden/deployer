@@ -23,8 +23,15 @@ from six import StringIO
 
 from deployer import loader
 from deployer.cli import initialize
+from deployer.plugins import Fail
 from deployer.plugins import TopLevel
 from deployer.plugins.echo import Echo
+
+
+def test_plugin_fail_invalid():
+    assert_that(Fail.valid({}), equal_to(False))
+    assert_that(Fail.valid(None), equal_to(False))
+    assert_that(Fail.valid(OrderedDict({'a': 'abc'})), equal_to(False))
 
 
 def test_plugin_top_level_is_created():
