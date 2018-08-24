@@ -24,8 +24,6 @@ The module providing the base class of all ```PyDeployer``` plug-ins.
 
 import logging
 
-from schema import SchemaWrongKeyError
-
 from deployer.registry import Registry
 
 from .plugin_proxy import PluginProxy
@@ -75,19 +73,25 @@ class Plugin:
         return None
 
     @staticmethod
+    def _recursive_valid(node):
+        # find a workable plugin
+        plugin = Plugin._find_matching_plugin_for_node(node)
+        if plugin:
+            return plugin.valid(node)
+        else:
+            return False
+
+    @staticmethod
     def _recursive_build(node):
         # find a workable plugin
         plugin = Plugin._find_matching_plugin_for_node(node)
         if plugin:
-            try:
-                if plugin.valid(node):
-                    # handle common elements
-                    name = node['name'] if 'name' in node else plugin.TAG
-                    for sub_node in plugin.build(node):
-                        yield PluginProxy(name, sub_node)
-                else:
-                    raise FailedValidation(node)
-            except SchemaWrongKeyError:
+            if plugin.valid(node):
+                # handle common elements
+                name = node['name'] if 'name' in node else plugin.TAG
+                for sub_node in plugin.build(node):
+                    yield PluginProxy(name, sub_node)
+            else:
                 raise FailedValidation(node)
         else:
             raise InvalidNode(node)

@@ -27,6 +27,7 @@ from collections import OrderedDict
 
 from schema import And
 from schema import Schema
+from schema import SchemaError
 
 from .plugin import Plugin
 
@@ -40,7 +41,7 @@ class Matrix(Plugin):
 
     SCHEMA = {
         'tags': [And(str, len)],
-        'tasks': [{And(str, len): And(str, len)}],
+        'tasks': [dict],
     }
 
     def __init__(self, node):
@@ -57,13 +58,21 @@ class Matrix(Plugin):
         if Matrix.TAG not in node:
             return False
 
-        return Schema(Matrix.SCHEMA).validate(node[Matrix.TAG])
+        try:
+            Schema(Matrix.SCHEMA).validate(node[Matrix.TAG])
+        except SchemaError:
+            return False
+
+        for node in node[Matrix.TAG]['tasks']:
+            if not Plugin._recursive_valid(node):
+                return False
+
+        return True
 
     @staticmethod
     def build(node):
         """Build a ```Matrix``` node."""
-        if Matrix.valid(node):
-            yield Matrix(node[Matrix.TAG])
+        yield Matrix(node[Matrix.TAG])
 
     def _execute_tasks(self):
         result = 'success'

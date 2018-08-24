@@ -16,10 +16,8 @@
 from collections import OrderedDict
 
 from hamcrest import assert_that
-from hamcrest import calling
 from hamcrest import equal_to
 from hamcrest import instance_of
-from hamcrest import raises
 from hamcrest import starts_with
 from six import StringIO
 
@@ -60,7 +58,7 @@ def test_plugin_echo_valid():
 
 def test_plugin_echo_build():
     subject = Echo.build({'echo': 'Testing'})
-    assert_that(calling(next).with_args(subject), raises(StopIteration))
+    assert_that(next(subject), instance_of(Echo))
 
 
 def test_plugin_echo_works(caplog):

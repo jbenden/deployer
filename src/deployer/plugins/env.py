@@ -31,6 +31,7 @@ from schema import And
 from schema import Optional
 from schema import Or
 from schema import Schema
+from schema import SchemaError
 
 from .plugin import Plugin
 
@@ -68,13 +69,17 @@ class Env(Plugin):
         if Env.TAG not in node:
             return False
 
-        return Schema(Env.SCHEMA).validate(node[Env.TAG])
+        try:
+            Schema(Env.SCHEMA).validate(node[Env.TAG])
+        except SchemaError:
+            return False
+
+        return True
 
     @staticmethod
     def build(node):
         """Build an Echo node."""
-        if Env.valid(node):
-            yield Env(node['env'])
+        yield Env(node['env'])
 
     def execute(self):
         """Perform the plugin's task purpose."""

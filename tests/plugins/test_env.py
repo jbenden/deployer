@@ -18,9 +18,8 @@ from collections import OrderedDict
 
 import pytest
 from hamcrest import assert_that
-from hamcrest import calling
 from hamcrest import equal_to
-from hamcrest import raises
+from hamcrest import instance_of
 from six import StringIO
 
 from deployer import loader
@@ -56,7 +55,7 @@ def test_plugin_env_invalid():
 
 def test_plugin_env_build():
     subject = Env.build({'env': {'set': {'a': '12345'}}})
-    assert_that(calling(next).with_args(subject), raises(StopIteration))
+    assert_that(next(subject), instance_of(Env))
 
 
 def test_plugin_env_unset_all_and_adds_one_via_list(capenv):

@@ -33,10 +33,14 @@ class TopLevel(Plugin):
     """The very top most object of a whole pipeline."""
 
     @staticmethod
-    def valid(node):
+    def valid(document):
         """Ensure the top-level node structure is valid."""
-        if type(node) is not list:
+        if type(document) is not list:
             return False
+
+        for node in document:
+            if not Plugin._recursive_valid(node):
+                return False
 
         return True
 

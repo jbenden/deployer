@@ -53,8 +53,7 @@ class Echo(Plugin):
     @staticmethod
     def build(node):
         """Build an Echo node."""
-        if Echo.valid(node):
-            yield Echo(node)
+        yield Echo(node)
 
     def execute(self):
         """Perform the plugin's task purpose."""

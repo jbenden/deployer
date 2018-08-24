@@ -16,13 +16,13 @@
 from collections import OrderedDict
 
 from hamcrest import assert_that
-from hamcrest import calling
 from hamcrest import contains_string
 from hamcrest import equal_to
-from hamcrest import raises
+from hamcrest import instance_of
 from six import StringIO
 
 from deployer import loader
+from deployer.cli import initialize
 from deployer.plugins import Matrix
 from deployer.plugins import TopLevel
 
@@ -32,10 +32,35 @@ def test_plugin_matrix_invalid():
     assert_that(Matrix.valid(None), equal_to(False))
     assert_that(Matrix.valid(OrderedDict({'a': 'abc'})), equal_to(False))
 
+    initialize()
+
+    stream = StringIO('''
+    - name: test1
+      matrix:
+        tags:
+          - m1
+    ''')
+    document = loader.ordered_load(stream)
+    assert_that(TopLevel.valid(document), equal_to(False))
+
+    stream = StringIO('''
+    - name: test1
+      matrix:
+        tags:
+          - m1
+        tasks:
+          - name: test2
+            matrix:
+              tags:
+                - m11
+    ''')
+    document = loader.ordered_load(stream)
+    assert_that(TopLevel.valid(document), equal_to(False))
+
 
 def test_plugin_matrix_build():
     subject = Matrix.build({'matrix': {'tags': ['1'], 'tasks': {'echo': '12345'}}})
-    assert_that(calling(next).with_args(subject), raises(StopIteration))
+    assert_that(next(subject), instance_of(Matrix))
 
 
 def test_plugin_matrix_fails_inner_task(caplog):
@@ -72,6 +97,8 @@ def test_plugin_matrix_runs_with_two_elements(caplog):
             echo: Hello world.
     ''')
     document = loader.ordered_load(stream)
+
+    assert_that(TopLevel.valid(document), equal_to(True))
 
     nodes = TopLevel.build(document)
 

@@ -53,8 +53,7 @@ class Fail(Plugin):
     @staticmethod
     def build(node):
         """Build a ```Fail``` node."""
-        if Fail.valid(node):
-            yield Fail(node)
+        yield Fail(node)
 
     def execute(self):
         """Perform the plugin's task purpose."""

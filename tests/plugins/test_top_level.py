@@ -51,6 +51,11 @@ def test_plugin_top_level_is_created():
 def test_plugin_top_level_invalid():
     assert_that(TopLevel.valid({}), equal_to(False))
     assert_that(TopLevel.valid(None), equal_to(False))
+    stream = StringIO('''
+    - name: test1
+    ''')
+    document = loader.ordered_load(stream)
+    assert_that(TopLevel.valid(document), equal_to(False))
 
 
 def test_plugin_top_level_valid_empty_list():
