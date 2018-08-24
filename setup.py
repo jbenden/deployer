@@ -68,6 +68,7 @@ setup(
         'click',
         'colorama;platform_system=="Windows"',
         'colorlog',
+        'Jinja2',
         'pluggy',
         'pyaml',
         'schema',
