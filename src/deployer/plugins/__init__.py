@@ -17,10 +17,49 @@
 
 # flake8: noqa
 
+import logging
+from collections import OrderedDict
+
 from .api import hookimpl
 from .echo import Echo
 from .env import Env
+from .matrix import Matrix
+from .plugin import Plugin
 from .top_level import TopLevel
+
+LOGGER = logging.getLogger(__name__)
+
+
+class Fail(Plugin):
+    """Fail with purpose."""
+
+    TAG = 'fail'
+
+    def __init__(self, msg):
+        """Ctor."""
+        self.fail = msg['fail'] if 'fail' in msg else ''
+
+    @staticmethod
+    def valid(node):
+        """Ensure node structure is valid."""
+        if type(node) is not OrderedDict:
+            return False
+
+        if Fail.TAG not in node:
+            return False
+
+        return True
+
+    @staticmethod
+    def build(node):
+        """Build a ```Fail``` node."""
+        if Fail.valid(node):
+            yield Fail(node)
+
+    def execute(self):
+        """Perform the plugin's task purpose."""
+        LOGGER.error("%s", self.fail)
+        return 'failure'
 
 
 @hookimpl
@@ -28,3 +67,5 @@ def deployer_register(registry):
     """Perform built-in plug-in registrations."""
     registry.register_plugin('echo', Echo)
     registry.register_plugin('env', Env)
+    registry.register_plugin('fail', Fail)
+    registry.register_plugin('matrix', Matrix)
