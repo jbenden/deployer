@@ -74,12 +74,12 @@ class Matrix(Plugin):
         """Build a ```Matrix``` node."""
         yield Matrix(node[Matrix.TAG])
 
-    def _execute_tasks(self):
+    def _execute_tasks(self, context):
         result = 'success'
 
         for node in self._tasks:
             for plugin in Plugin._recursive_build(node):
-                result = plugin.execute()
+                result = plugin.execute(context)
                 if not result == 'success':
                     break
             if not result == 'success':
@@ -87,12 +87,12 @@ class Matrix(Plugin):
 
         return result
 
-    def execute(self):
+    def execute(self, context):
         """Perform the plugin's task purpose."""
         result = 'success'
         for tag in self._tags:
             LOGGER.debug('Beginning matrix entry: %s', tag)
-            result = self._execute_tasks()
+            result = self._execute_tasks(context)
             LOGGER.debug('Completed matrix entry: %s', tag)
             if not result == 'success':
                 break

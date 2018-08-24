@@ -38,12 +38,12 @@ class PluginProxy(Proxy):
         super(PluginProxy, self).__init__(obj)
         self._name = name
 
-    def execute(self):
+    def execute(self, context):
         """Proxy of a plug-in's `execute` method."""
         LOGGER.info("%s is starting.", self._name)
         # emit a start event here, events MUST have correlation id
         start = time.time()
-        result = object.__getattribute__(self, "_obj").execute()
+        result = object.__getattribute__(self, "_obj").execute(context)
         end = time.time()
         LOGGER.info("%s has finished with %r, in %0.9f seconds.", self._name, result, (end - start))
         # emit an end event here

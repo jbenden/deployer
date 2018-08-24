@@ -55,7 +55,7 @@ class Fail(Plugin):
         """Build a ```Fail``` node."""
         yield Fail(node)
 
-    def execute(self):
+    def execute(self, context):
         """Perform the plugin's task purpose."""
         LOGGER.error("%s", self.fail)
         return 'failure'

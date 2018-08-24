@@ -71,7 +71,7 @@ def test_plugin_echo_build():
 def test_plugin_echo_works(caplog):
     # NOTE: because no toplevel is called, we do NOT proxy!
     subject = next(Echo.build(OrderedDict({'echo': 'Testing'})))
-    subject.execute()
+    subject.execute(None)
     assert_that(len(caplog.records), equal_to(1))
     assert_that(caplog.records[0].message, equal_to("| Testing"))
 
@@ -91,7 +91,7 @@ def test_plugin_top_level_produces_logging(caplog):
 
     for index, node in enumerate(nodes):
         assert_that(node, instance_of(Echo))
-        node.execute()
+        node.execute(None)
 
         assert_that(len(caplog.records), equal_to(3))
         assert_that(caplog.records[0].message, starts_with("test%d is starting" % index))

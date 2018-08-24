@@ -55,7 +55,7 @@ class Echo(Plugin):
         """Build an Echo node."""
         yield Echo(node)
 
-    def execute(self):
+    def execute(self, context):
         """Perform the plugin's task purpose."""
         LOGGER.info("| %s", self.msg)
         return 'success'

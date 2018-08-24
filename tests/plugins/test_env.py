@@ -72,7 +72,7 @@ def test_plugin_env_unset_all_and_adds_one_via_list(capenv):
     nodes = TopLevel.build(document)
 
     for node in nodes:
-        node.execute()
+        node.execute(None)
 
     assert_that('Joe' in os.environ, equal_to(True))
     assert_that(len(os.environ), equal_to(1))
@@ -91,7 +91,7 @@ def test_plugin_env_unset_all_and_adds_one_via_str(capenv):
     nodes = TopLevel.build(document)
 
     for node in nodes:
-        node.execute()
+        node.execute(None)
 
     assert_that('Joe' in os.environ, equal_to(True))
     assert_that(len(os.environ), equal_to(1))
@@ -113,7 +113,7 @@ def test_plugin_env_set_one(capenv):
     nodes = TopLevel.build(document)
 
     for node in nodes:
-        node.execute()
+        node.execute(None)
 
     assert_that('Joe' in os.environ, equal_to(True))
 
@@ -132,6 +132,6 @@ def test_plugin_env_unset_filter(capenv):
     os.putenv('Joe', '123')
 
     for node in nodes:
-        node.execute()
+        node.execute(None)
 
     assert_that(os.getenv('Joe', None), equal_to(None))

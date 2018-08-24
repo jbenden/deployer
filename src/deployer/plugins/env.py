@@ -81,7 +81,7 @@ class Env(Plugin):
         """Build an Echo node."""
         yield Env(node['env'])
 
-    def execute(self):
+    def execute(self, context):
         """Perform the plugin's task purpose."""
         for env in os.environ.copy():
             for pattern in self.env_unset:

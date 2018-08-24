@@ -78,7 +78,7 @@ def test_plugin_matrix_fails_inner_task(caplog):
     nodes = TopLevel.build(document)
 
     for node in nodes:
-        node.execute()
+        node.execute(None)
 
     assert_that(caplog.text, contains_string('entry: m1'))
     assert_that(caplog.text, not contains_string('entry: m2'))
@@ -103,7 +103,7 @@ def test_plugin_matrix_runs_with_two_elements(caplog):
     nodes = TopLevel.build(document)
 
     for node in nodes:
-        node.execute()
+        node.execute(None)
 
     assert_that(caplog.text, contains_string('entry: m1'))
     assert_that(caplog.text, contains_string('entry: m2'))
