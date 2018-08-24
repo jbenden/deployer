@@ -22,7 +22,39 @@ The module providing the base class of all ```PyDeployer``` plug-ins.
 :license: Apache License 2.0, see LICENSE.txt for full details.
 """
 
+import logging
+
+from schema import SchemaWrongKeyError
+
 from deployer.registry import Registry
+
+from .plugin_proxy import PluginProxy
+
+LOGGER = logging.getLogger(__name__)
+
+
+class InvalidNode(RuntimeError):
+    """Exception thrown when a YAML section cannot be handled via all plug-ins."""
+
+    def __init__(self, node):
+        """Ctor."""
+        self.node = node
+
+    def __str__(self):
+        """Get a string representation of this exception."""
+        return "All available plug-ins are unable to handle the '%r' expression." % self.node    # noqa: no-cover
+
+
+class FailedValidation(RuntimeError):
+    """Exception thrown when a YAML section cannot be correctly validated by a plug-in."""
+
+    def __init__(self, node):
+        """Ctor."""
+        self.node = node
+
+    def __str__(self):
+        """Get a string representation of this exception."""
+        return "Failed to validate expression:\n\n%r" % self.node                                # noqa: no-cover
 
 
 class Plugin:
@@ -41,3 +73,21 @@ class Plugin:
                     return plugins[plugin]
 
         return None
+
+    @staticmethod
+    def _recursive_build(node):
+        # find a workable plugin
+        plugin = Plugin._find_matching_plugin_for_node(node)
+        if plugin:
+            try:
+                if plugin.valid(node):
+                    # handle common elements
+                    name = node['name'] if 'name' in node else plugin.TAG
+                    for sub_node in plugin.build(node):
+                        yield PluginProxy(name, sub_node)
+                else:
+                    raise FailedValidation(node)
+            except SchemaWrongKeyError:
+                raise FailedValidation(node)
+        else:
+            raise InvalidNode(node)

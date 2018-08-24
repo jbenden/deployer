@@ -65,19 +65,19 @@ def test_plugin_top_level_build_empty_list():
 def test_plugin_top_level_build_list_broken():
     subject = TopLevel.build([{}])
 
-    from deployer.plugins.top_level import InvalidNode
+    from deployer.plugins.plugin import InvalidNode
     assert_that(calling(next).with_args(subject), raises(InvalidNode))
 
 
 def test_plugin_top_level_build_ordereddict_list_broken():
     subject = TopLevel.build([OrderedDict({'name': 'Testing'})])
 
-    from deployer.plugins.top_level import InvalidNode
+    from deployer.plugins.plugin import InvalidNode
     assert_that(calling(next).with_args(subject), raises(InvalidNode))
 
 
 def test_plugin_top_level_build_errored_plugin():
     subject = TopLevel.build([OrderedDict({'name': 'Testing', 'env': {'a': 123}})])
 
-    from deployer.plugins.top_level import FailedValidation
+    from deployer.plugins.plugin import FailedValidation
     assert_that(calling(next).with_args(subject), raises(FailedValidation))
