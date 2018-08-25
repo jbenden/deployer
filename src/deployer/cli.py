@@ -31,14 +31,19 @@ Why does this file exist, and why not put this in __main__?
 """
 import logging
 import os
+import platform
 import sys
 
 import click
 import pluggy
 import six
 
+from deployer import __version__
 from deployer import plugins as builtin_plugins
+from deployer.context import Context
+from deployer.loader import ordered_load
 from deployer.plugins import hookspec as hookspecs
+from deployer.plugins.top_level import TopLevel
 from deployer.registry import Registry
 
 try:
@@ -53,11 +58,11 @@ except ImportError:                                            # noqa: no-cover
     pass                                                       # noqa: no-cover
 
 
-def setup_logging():
+def setup_logging(level=logging.DEBUG):
     """Initialize the logging infrastructure."""
     root = logging.getLogger()
-    root.setLevel(logging.DEBUG)
-    format = '%(asctime)s - %(levelname)-8s - %(message)s'
+    root.setLevel(level)
+    format = '%(asctime)s.%(msecs)03d - %(levelname)-8s - %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
     if 'colorlog' in sys.modules and os.isatty(2):
         cformat = '%(log_color)s' + format
@@ -98,16 +103,84 @@ def _get_plugin_manager(plugins=()):
 LOGGER = logging.getLogger(__name__)
 
 
-def initialize():
+def initialize(level=logging.DEBUG):
     """Perform basic initialization of program."""
-    setup_logging()
+    setup_logging(level)
     Registry.plugin_manager = _get_plugin_manager()
     Registry.plugin_manager.hook.deployer_register(registry=Registry())
 
 
-@click.command()
-@click.argument('names', nargs=-1)
-def main(names):
+@click.group(invoke_without_command=True)
+@click.pass_context
+@click.option('--debug', '-d', is_flag=True, default=False,
+              help="Enable debugging and verbose output.")
+@click.option('--silent', '-d', is_flag=True, default=False,
+              help="Show minimal output; namely errors and fatal messages.")
+def main(ctx, debug, silent):
     """Entry point."""
-    initialize()
-    click.echo(repr(names))
+    # determine logging level
+    level = logging.INFO
+    if debug:
+        level = logging.DEBUG
+    if silent:
+        level = logging.ERROR
+    initialize(level)
+
+    # print banner information
+    LOGGER.info("Starting PyDeployer version %s" % __version__)
+    LOGGER.info("(C) 2018 Joseph Benden <joe (at) benden.us>")
+    LOGGER.info("Homepage: https://github.com/jbenden/deployer")
+
+    # print basic system information
+    LOGGER.info("Running with Python %s", sys.version.replace("\n", ""))
+    LOGGER.info("Running on platform %s", platform.platform())
+
+    if ctx.invoked_subcommand is None:
+        sys.exit(0)
+
+
+@main.command('exec')
+@click.argument('pipeline', nargs=-1, type=click.File('rb'), required=True, metavar='<path/to/pipeline.yaml>')
+def execute(pipeline):
+    """Execute a pipeline definition."""
+    for f in pipeline:
+        LOGGER.info("Processing pipeline definition '%s'", f.name)
+
+        try:
+            document = ordered_load(f)
+        except:  # noqa: E722
+            document = None
+
+        if TopLevel.valid(document):
+            nodes = TopLevel.build(document)
+
+            context = Context()
+
+            for node in nodes:
+                result = node.execute(context)
+
+                if result == 'failure':
+                    sys.exit(1)
+        else:
+            sys.exit(2)
+
+
+@main.command()
+@click.argument('pipeline', nargs=-1, type=click.File('rb'), required=True, metavar='<path/to/pipeline.yaml>')
+def validate(pipeline):
+    """Validate a pipeline definition for syntactic correctness."""
+    for f in pipeline:
+        LOGGER.info("Processing pipeline definition '%s'", f.name)
+
+        valid = False
+        try:
+            document = ordered_load(f)
+            if TopLevel.valid(document):
+                click.secho('Document is OK.', fg='green')
+                valid = True
+        except:  # noqa: E722
+            valid = False
+
+        if not valid:
+            click.secho('Document is BAD.', fg='red')
+            sys.exit(1)

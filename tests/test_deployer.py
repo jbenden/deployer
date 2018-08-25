@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from click.testing import CliRunner
 
 from deployer.cli import main
@@ -23,3 +25,37 @@ def test_main():
     result = runner.invoke(main, [])
 
     assert result.exit_code == 0
+
+
+def test_validate_with_simple_example():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['validate', example])
+
+    assert result.exit_code == 0
+
+
+def test_validate_with_broken_yaml():
+    runner = CliRunner()
+    result = runner.invoke(main, ['validate', __file__])
+
+    assert result.exit_code == 1
+
+
+def test_exec_with_simple_example():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', example])
+
+    assert result.exit_code == 0
+
+
+def test_exec_with_broken_file():
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', __file__])
+
+    assert result.exit_code == 2
