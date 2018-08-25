@@ -1,0 +1,5 @@
+---
+
+- name: Simple test
+  echo: Hello World.
+
