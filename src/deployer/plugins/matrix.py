@@ -40,10 +40,11 @@ def matrix_scoped_variables(context, tag):
     """Ensure all variables introduced by the ```Matrix``` plug-in are scoped to itself."""
     if context:
         context.variables.push_last()
+
         # set the current matrix tag variable
-        # matrix_tag == m1
         context.variables.last()['matrix_tag'] = tag
-        # matrix_list == [m1, m2]
+
+        # append the current matrix tag onto the descending list of entered matrices.
         if 'matrix_list' not in context.variables.last():
             context.variables.last()['matrix_list'] = []
         context.variables.last()['matrix_list'].append(tag)
