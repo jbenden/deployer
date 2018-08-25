@@ -19,6 +19,7 @@ from collections import OrderedDict
 
 import pytest
 from hamcrest import assert_that
+from hamcrest import contains_string
 from hamcrest import equal_to
 from hamcrest import instance_of
 from six import StringIO
@@ -156,3 +157,23 @@ def test_plugin_echo_renders_node(capenv):
     node.execute(context)
 
     assert_that(os.getenv('Joe', None), equal_to(platform.node()))
+
+
+def test_plugin_env_will_render_node(capenv, caplog):
+    stream = StringIO('''
+    - name: test0
+      env:
+        set:
+          "Joe": "{{ node }}"
+    - name: test case
+      echo: "{{ env.Joe }}"
+    ''')
+    document = loader.ordered_load(stream)
+
+    context = Context()
+
+    for node in TopLevel.build(document):
+        node.execute(context)
+
+    assert_that(os.getenv('Joe', None), equal_to(platform.node()))
+    assert_that(caplog.text, contains_string("| %s" % platform.node()))

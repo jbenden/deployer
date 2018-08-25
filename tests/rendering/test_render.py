@@ -89,8 +89,8 @@ def test_rendering_passthrough_raw_string_and_variable():
 
 
 def test_rendering_raw_one_variable():
-    fixture = """Hello {{ env.a }}."""
-    subject = render(fixture, env={'a': '''{% raw %}World{% endraw %}'''})
+    fixture = """Hello {{ test_env.a }}."""
+    subject = render(fixture, test_env={'a': '''{% raw %}World{% endraw %}'''})
 
     assert_that(subject, equal_to("Hello World."))
 

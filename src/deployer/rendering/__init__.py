@@ -23,6 +23,7 @@ A recursive Jinja2 rendering engine.
 """
 
 import logging
+import os
 import re
 
 from jinja2 import Environment
@@ -96,6 +97,8 @@ def render(value, **kwargs):
     try:
         environment = Environment(autoescape=False, undefined=StrictUndefined, finalize=finalize)  # nosec
         environment.filters['render'] = render
+
+        kwargs['env'] = os.environ
 
         if isinstance(value, string_types) and 'raw' in value:
             value = raw_regexp.sub(('{%% raw %%}%s' % raw_sentinal), value)
