@@ -27,10 +27,8 @@ import logging
 from collections import OrderedDict
 
 from schema import And
-from schema import Schema
-from schema import SchemaError
 
-from .plugin import Plugin
+from deployer.plugins.plugin_with_tasks import PluginWithTasks
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,20 +53,19 @@ def matrix_scoped_variables(context, tag):
             context.variables.pop()
 
 
-class Matrix(Plugin):
+class Matrix(PluginWithTasks):
     """Manage multiple combinations of a pipeline."""
 
     TAG = 'matrix'
 
     SCHEMA = {
         'tags': [And(str, len)],
-        'tasks': [dict],
     }
 
     def __init__(self, node):
         """Ctor."""
         self._tags = node['tags']
-        self._tasks = node['tasks']
+        super(Matrix, self).__init__(node)
 
     @staticmethod
     def valid(node):
@@ -79,34 +76,12 @@ class Matrix(Plugin):
         if Matrix.TAG not in node:
             return False
 
-        try:
-            Schema(Matrix.SCHEMA).validate(node[Matrix.TAG])
-        except SchemaError:
-            return False
-
-        for node in node[Matrix.TAG]['tasks']:
-            if not Plugin._recursive_valid(node):
-                return False
-
-        return True
+        return PluginWithTasks._valid(Matrix.SCHEMA, Matrix.TAG, node)
 
     @staticmethod
     def build(node):
         """Build a ```Matrix``` node."""
         yield Matrix(node[Matrix.TAG])
-
-    def _execute_tasks(self, context):
-        result = 'success'
-
-        for node in self._tasks:
-            for plugin in Plugin._recursive_build(node):
-                result = plugin.execute(context)
-                if not result == 'success':
-                    break
-            if not result == 'success':
-                break
-
-        return result
 
     def execute(self, context):
         """Perform the plugin's task purpose."""
