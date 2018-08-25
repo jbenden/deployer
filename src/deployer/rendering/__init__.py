@@ -45,6 +45,9 @@ class BooleanExpression:
 
     def evaluate(self, context):
         """Evaluate the boolean expression through the templating system, returning the result."""
+        if isinstance(self._expression, bool):
+            return self._expression
+
         for invalid in self.INVALID_SEQUENCES:
             if invalid in self._expression:
                 raise RuntimeError("Expression must not contain Jinja2 templating characters:\n%s" % self._expression)
