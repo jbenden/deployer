@@ -213,3 +213,72 @@ def test_plugin_echo_with_simple_when(caplog):
         node.execute(context)
 
         assert_that(len(caplog.records), equal_to(0))
+
+
+def test_plugin_echo_renders_multiple_items(caplog):
+    stream = StringIO('''
+    - name: test0
+      echo: "{{ item }}"
+      with_items:
+        - a-0
+        - b-0
+        - c-0
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for index, node in enumerate(nodes):
+        assert_that(node, instance_of(Echo))
+        node.execute(context)
+
+    assert_that(len(caplog.records), equal_to(9))
+    assert_that(caplog.text, contains_string("| a-0"))
+    assert_that(caplog.text, contains_string("| b-0"))
+    assert_that(caplog.text, contains_string("| c-0"))
+
+
+def test_plugin_fail_renders_multiple_items(caplog):
+    stream = StringIO('''
+    - name: test0
+      fail: "{{ item }}"
+      with_items:
+        - a-0
+        - b-0
+        - c-0
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for index, node in enumerate(nodes):
+        node.execute(context)
+
+    assert_that(len(caplog.records), equal_to(3))
+    assert_that(caplog.text, contains_string("| a-0"))
+    assert_that(caplog.text, not contains_string("| b-0"))
+    assert_that(caplog.text, not contains_string("| c-0"))
+
+
+def test_plugin_fail_fails_rendering_multiple_items_without_a_context(caplog):
+    stream = StringIO('''
+    - name: test0
+      fail: "{{ item }}"
+      with_items:
+        - a-0
+        - b-0
+        - c-0
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    for index, node in enumerate(nodes):
+        node.execute(None)
+
+    assert_that(len(caplog.records), equal_to(3))
+    assert_that(caplog.text, contains_string("{{ item }}"))
