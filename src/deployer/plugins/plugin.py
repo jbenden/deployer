@@ -55,7 +55,7 @@ class FailedValidation(RuntimeError):
         return "Failed to validate expression:\n\n%r" % self.node                                # noqa: no-cover
 
 
-class Plugin:
+class Plugin(object):
     """The base class of all ```PyDeployer``` plug-ins."""
 
     @staticmethod
