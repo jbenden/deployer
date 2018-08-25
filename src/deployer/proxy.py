@@ -37,7 +37,7 @@ class Proxy(object):
     #
     def __getattribute__(self, name):
         """Get attribute."""
-        if not name.startswith("_") and hasattr(type(self), name):
+        if not name.startswith("__") and hasattr(type(self), name):
             return object.__getattribute__(self, name)                   # noqa: no-cover
         return getattr(object.__getattribute__(self, "_obj"), name)
 
