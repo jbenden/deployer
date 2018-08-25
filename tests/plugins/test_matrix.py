@@ -159,7 +159,7 @@ def test_plugin_matrix_runs_with_two_matrices_and_contains_tags(caplog):
                 - m3
               tasks:
                 - name: Testing task
-                  echo: Hello world.
+                  echo: "Hello world. {{ matrix_tag }}"
     ''')
     document = loader.ordered_load(stream)
 
@@ -178,7 +178,7 @@ def test_plugin_matrix_runs_with_two_matrices_and_contains_tags(caplog):
     assert_that(caplog.text, contains_string('entry: m1'))
     assert_that(caplog.text, contains_string('entry: m2'))
     assert_that(caplog.text, contains_string('entry: m3'))
-    assert_that(caplog.text, contains_string('Hello world.'))
+    assert_that(caplog.text, contains_string('Hello world. m3'))
 
     assert_that(context.variables.last(), not has_entry('matrix_tag', 'm2'))
     assert_that(context.variables.last(), not has_entry('matrix_list', ['m2']))
