@@ -28,6 +28,7 @@ import re
 from jinja2 import Environment
 from jinja2.exceptions import TemplateSyntaxError
 from jinja2.exceptions import UndefinedError
+from jinja2.runtime import StrictUndefined
 from six import string_types
 
 LOGGER = logging.getLogger(__name__)
@@ -64,7 +65,7 @@ def render(value, **kwargs):
         return value
 
     try:
-        environment = Environment(autoescape=False, finalize=finalize)  # nosec
+        environment = Environment(autoescape=False, undefined=StrictUndefined, finalize=finalize)  # nosec
         environment.filters['render'] = render
 
         if isinstance(value, string_types) and 'raw' in value:
