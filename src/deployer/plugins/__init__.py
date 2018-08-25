@@ -57,7 +57,12 @@ class Fail(Plugin):
 
     def execute(self, context):
         """Perform the plugin's task purpose."""
-        LOGGER.error("%s", self.fail)
+        if context:
+            from deployer.rendering import render
+            msg = render(self.fail, **context.variables.last())
+        else:
+            msg = self.fail
+        LOGGER.error("| %s", msg)
         return 'failure'
 
 
