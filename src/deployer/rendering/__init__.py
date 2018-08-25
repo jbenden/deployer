@@ -34,6 +34,32 @@ from six import string_types
 LOGGER = logging.getLogger(__name__)
 
 
+class BooleanExpression:
+    """Simplistic boolean conditional evaluation through the Jinja2 templating engine."""
+
+    INVALID_SEQUENCES = ['{{', '}}', '{%', '%}']
+
+    def __init__(self, expression):
+        """Ctor."""
+        self._expression = expression
+
+    def evaluate(self, context):
+        """Evaluate the boolean expression through the templating system, returning the result."""
+        for invalid in self.INVALID_SEQUENCES:
+            if invalid in self._expression:
+                raise RuntimeError("Expression must not contain Jinja2 templating characters:\n%s" % self._expression)
+
+        template = "{%%- if %s %%}True{%% else %%}False{%% endif -%%}" % self._expression
+        result = render(template, **context.variables.last().copy())
+
+        if result == 'True':
+            return True
+        elif result == 'False':
+            return False
+
+        raise RuntimeError("Jinja2 returned an invalid result for expression:\n%s" % self._expression)  # noqa: no-coverage
+
+
 def render(value, **kwargs):
     """Use Jinja2 for recursive, template-based rendering.
 

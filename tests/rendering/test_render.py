@@ -23,6 +23,7 @@ from jinja2.exceptions import TemplateSyntaxError
 from jinja2.exceptions import UndefinedError
 
 from deployer.context import Context
+from deployer.rendering import BooleanExpression
 from deployer.rendering import render
 
 
@@ -121,3 +122,26 @@ def test_rendering_simple_context():
     subject = render(fixture, **context.variables.last())
 
     assert_that(subject, equal_to(sys.platform.lower()))
+
+
+def test_rendering_simple_boolean_true():
+    context = Context()
+    fixture = BooleanExpression("""True""")
+    subject = fixture.evaluate(context)
+
+    assert_that(subject, equal_to(True))
+
+
+def test_rendering_simple_boolean_false():
+    context = Context()
+    fixture = BooleanExpression("""False""")
+    subject = fixture.evaluate(context)
+
+    assert_that(subject, equal_to(False))
+
+
+def test_rendering_invalid_expression_raises():
+    context = Context()
+    fixture = BooleanExpression("""{{ False }}""")
+
+    assert_that(calling(fixture.evaluate).with_args(context), raises(RuntimeError))
