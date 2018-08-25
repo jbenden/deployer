@@ -156,3 +156,60 @@ def test_plugin_matrix_renders_node(caplog):
     m1.execute(context)
 
     assert_that(caplog.text, contains_string("| %s" % platform.node()))
+
+
+def test_plugin_echo_with_false_when(caplog):
+    stream = StringIO('''
+    - name: test0
+      echo: "{{ node }}"
+      when: False
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for index, node in enumerate(nodes):
+        assert_that(node, instance_of(Echo))
+        node.execute(context)
+
+        assert_that(len(caplog.records), equal_to(0))
+
+
+def test_plugin_echo_with_true_when(caplog):
+    stream = StringIO('''
+    - name: test0
+      echo: "{{ node }}"
+      when: True
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for index, node in enumerate(nodes):
+        assert_that(node, instance_of(Echo))
+        node.execute(context)
+
+        assert_that(len(caplog.records), equal_to(3))
+
+
+def test_plugin_echo_with_simple_when(caplog):
+    stream = StringIO('''
+    - name: test0
+      echo: "{{ node }}"
+      when: nbcpus == 0
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for index, node in enumerate(nodes):
+        assert_that(node, instance_of(Echo))
+        node.execute(context)
+
+        assert_that(len(caplog.records), equal_to(0))

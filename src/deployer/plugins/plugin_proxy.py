@@ -26,6 +26,7 @@ import logging
 import time
 
 from deployer.proxy import Proxy
+from deployer.rendering import BooleanExpression
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,13 +34,20 @@ LOGGER = logging.getLogger(__name__)
 class PluginProxy(Proxy):
     """Wrap-around for all plug-ins."""
 
-    def __init__(self, name, obj):
+    def __init__(self, name, obj, when=None):
         """Ctor."""
         super(PluginProxy, self).__init__(obj)
         self._name = name
+        self._when = when
 
     def execute(self, context):
         """Proxy of a plug-in's `execute` method."""
+        if self._when is not None:
+            expr = BooleanExpression(self._when)
+
+            if not expr.evaluate(context):
+                return 'skipped'
+
         LOGGER.info("%s is starting.", self._name)
         # emit a start event here, events MUST have correlation id
         start = time.time()

@@ -89,8 +89,9 @@ class Plugin:
             if plugin.valid(node):
                 # handle common elements
                 name = node['name'] if 'name' in node else plugin.TAG
+                when = node['when'] if 'when' in node else None
                 for sub_node in plugin.build(node):
-                    yield PluginProxy(name, sub_node)
+                    yield PluginProxy(name, sub_node, when=when)
             else:
                 raise FailedValidation(node)
         else:
