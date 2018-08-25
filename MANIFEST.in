@@ -16,4 +16,6 @@ include README.rst
 
 include tox.ini .travis.yml appveyor.yml
 
+recursive-include examples *.yaml
+
 global-exclude *.py[cod] __pycache__ *.so *.dylib
