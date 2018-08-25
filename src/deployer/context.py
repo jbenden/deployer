@@ -76,6 +76,7 @@ class Context:
             'node': platform.node(),
             'platform': sys.platform.lower(),
             'is_linux': sys.platform.lower().startswith('linux'),
+            'is_bsd': sys.platform.lower().find('bsd') != -1,
             'is_darwin': sys.platform.lower().startswith('darwin'),
             'is_windows': sys.platform.lower().startswith('windows'),
         })
