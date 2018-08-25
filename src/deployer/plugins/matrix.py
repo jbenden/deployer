@@ -22,6 +22,7 @@ The module plug-in providing the ``matrix`` command.
 :license: Apache License 2.0, see LICENSE.txt for full details.
 """
 
+import contextlib
 import logging
 from collections import OrderedDict
 
@@ -32,6 +33,25 @@ from schema import SchemaError
 from .plugin import Plugin
 
 LOGGER = logging.getLogger(__name__)
+
+
+@contextlib.contextmanager
+def matrix_scoped_variables(context, tag):
+    """Ensure all variables introduced by the ```Matrix``` plug-in are scoped to itself."""
+    if context:
+        context.variables.push_last()
+        # set the current matrix tag variable
+        # matrix_tag == m1
+        context.variables.last()['matrix_tag'] = tag
+        # matrix_list == [m1, m2]
+        if 'matrix_list' not in context.variables.last():
+            context.variables.last()['matrix_list'] = []
+        context.variables.last()['matrix_list'].append(tag)
+    try:
+        yield
+    finally:
+        if context:
+            context.variables.pop()
 
 
 class Matrix(Plugin):
@@ -90,21 +110,12 @@ class Matrix(Plugin):
     def execute(self, context):
         """Perform the plugin's task purpose."""
         result = 'success'
+
         for tag in self._tags:
-            if context:
-                context.variables.push_last()
-                # set the current matrix tag variable
-                # matrix_tag == m1
-                context.variables.last()['matrix_tag'] = tag
-                # matrix_list == [m1, m2]
-                if 'matrix_list' not in context.variables.last():
-                    context.variables.last()['matrix_list'] = []
-                context.variables.last()['matrix_list'].append(tag)
-            LOGGER.debug('Beginning matrix entry: %s', tag)
-            result = self._execute_tasks(context)
-            LOGGER.debug('Completed matrix entry: %s', tag)
-            if context:
-                context.variables.pop()
+            with matrix_scoped_variables(context, tag):
+                LOGGER.debug('Beginning matrix entry: %s', tag)
+                result = self._execute_tasks(context)
+                LOGGER.debug('Completed matrix entry: %s', tag)
             if not result == 'success':
                 break
 
