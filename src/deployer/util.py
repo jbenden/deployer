@@ -137,7 +137,7 @@ def async_check_output(args, reactor_process=None):
 
     process_protocol = SubprocessProtocol()
     try:
-        reactor_process.spawnProcess(process_protocol, args[0], args)
+        reactor_process.spawnProcess(process_protocol, args[0], args, env=None)
         return process_protocol.d
     except OSError as e:
         if e.errno is None or e.errno == errno.ENOENT:
