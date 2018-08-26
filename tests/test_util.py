@@ -38,13 +38,13 @@ def reactor(request):
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
 def test_util_unix_echo_works(reactor):
-    subject = sync_check_output(['/bin/echo', 'hello world'])
-    assert_that(subject, equal_to("hello world"))
+    subject = sync_check_output(['/bin/echo', 'hello world'])  # noqa: no-cover
+    assert_that(subject, equal_to("hello world"))  # noqa: no-cover
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
 def test_util_unix_nonexisting_fails(reactor):
-    assert_that(calling(sync_check_output).with_args(['/nonexistent', 'hello world']), raises(ProcessTerminated))
+    assert_that(calling(sync_check_output).with_args(['/nonexistent', 'hello world']), raises(ProcessTerminated))  # noqa: no-cover
 
 
 @pytest.mark.skipif(not IS_WINDOWS, reason='Irrelevant on unix')
@@ -54,4 +54,4 @@ def test_util_win_echo_works(reactor):
 
 @pytest.mark.skipif(not IS_WINDOWS, reason='Irrelevant on unix')
 def test_util_win_nonexisting_fails(reactor):
-    assert_that(calling(sync_check_output).with_args(["sdfsdfdsf329909092"]), raises(ProcessTerminated))
+    assert_that(calling(sync_check_output).with_args(["sdfsdfdsf329909092"]), raises(ProcessTerminated))  # noqa: no-cover
