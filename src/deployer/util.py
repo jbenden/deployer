@@ -56,6 +56,52 @@ def merge_dicts(*dict_args):
     return result
 
 
+class LoggingSubprocessProtocol(ProcessProtocol):
+    """Simple Twisted protocol which logs a process'es output."""
+
+    outBuf = ''
+    errBuf = ''
+
+    def connectionMade(self):
+        """Triggered upon program start, as it is entering its' `main` function."""
+        self.d = Deferred()
+
+    def outReceived(self, data):
+        """Triggered upon program `stdout` data arriving."""
+        text = data.decode('utf-8')
+        self.outBuf += text
+
+        pos = self.outBuf.find("\n")
+        while pos >= 0:
+            LOGGER.info("| %s" % self.outBuf[:pos])
+            self.outBuf = self.outBuf[pos + 1:len(self.outBuf)]
+            pos = self.outBuf.find("\n")
+
+    def errReceived(self, data):
+        """Triggered upon program `stderr` data arriving."""
+        text = data.decode('utf-8')
+        self.errBuf += text
+
+        pos = self.errBuf.find("\n")
+        while pos >= 0:
+            LOGGER.error("! %s" % self.errBuf[:pos])
+            self.errBuf = self.errBuf[pos + 1:len(self.errBuf)]
+            pos = self.errBuf.find("\n")
+
+    def processEnded(self, reason):
+        """Triggered upon the end of a program's execution."""
+        if len(self.outBuf):
+            LOGGER.info("| %s" % self.outBuf)
+
+        if len(self.errBuf):
+            LOGGER.error("! %s" % self.errBuf)
+
+        if reason.check(ProcessDone):
+            self.d.callback(self.outBuf)
+        else:
+            self.d.errback(reason)
+
+
 class SubprocessProtocol(ProcessProtocol):
     """Simple Twisted protocol which captures a process'es standard output."""
 

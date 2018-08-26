@@ -22,6 +22,7 @@ from hamcrest import equal_to
 from hamcrest import raises
 from twisted.internet.error import ProcessTerminated
 
+from deployer.cli import initialize
 from deployer.util import start_reactor
 from deployer.util import stop_reactor
 from deployer.util import sync_check_output
@@ -31,6 +32,7 @@ IS_WINDOWS = sys.platform.lower().startswith('win')
 
 @pytest.fixture(scope="module")
 def reactor(request):
+    initialize()
     r = start_reactor()
     yield
     stop_reactor(r)
