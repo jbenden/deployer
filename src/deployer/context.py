@@ -79,6 +79,9 @@ class Context:
             'is_bsd': sys.platform.lower().find('bsd') != -1,
             'is_darwin': sys.platform.lower().startswith('darwin'),
             'is_windows': sys.platform.lower().startswith('win'),
+            'is_travis': 'TRAVIS' in os.environ,
+            'is_appveyor': 'APPVEYOR' in os.environ,
+            'is_ci': 'CI' in os.environ or 'CONTINUOUS_INTEGRATION' in os.environ,
         })
 
     @staticmethod
