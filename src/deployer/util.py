@@ -100,8 +100,12 @@ def async_check_output(args, reactor_process=None):
             return defer.fail(e)
 
 
-def sync_check_output(argv=()):
+def sync_check_output(argv=(), reactor_process=None):
     """Execute and capture a process'es standard output."""
+    if reactor_process is None:                # noqa: no-cover
+        from twisted.internet import reactor   # noqa: no-cover
+        reactor_process = reactor              # noqa: no-cover
+
     import threading
 
     event = threading.Event()
@@ -115,9 +119,12 @@ def sync_check_output(argv=()):
         output[0] = result
         event.set()
 
-    d = async_check_output(argv)
-    d.addCallback(_cb)
-    d.addErrback(_cbe)
+    def _main(args):
+        d = async_check_output(args)
+        d.addCallback(_cb)
+        d.addErrback(_cbe)
+
+    reactor_process.callFromThread(_main, argv)
 
     event.wait(None)
 
