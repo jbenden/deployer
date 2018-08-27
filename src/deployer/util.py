@@ -84,7 +84,7 @@ class LoggingSubprocessProtocol(ProcessProtocol):
 
         pos = self.errBuf.find("\n")
         while pos >= 0:
-            LOGGER.error("! %s" % self.errBuf[:pos])
+            LOGGER.warn("! %s" % self.errBuf[:pos])
             self.errBuf = self.errBuf[pos + 1:len(self.errBuf)]
             pos = self.errBuf.find("\n")
 
@@ -94,7 +94,7 @@ class LoggingSubprocessProtocol(ProcessProtocol):
             LOGGER.info("| %s" % self.outBuf)
 
         if len(self.errBuf):
-            LOGGER.error("! %s" % self.errBuf)
+            LOGGER.warn("! %s" % self.errBuf)
 
         if reason.check(ProcessDone):
             self.d.callback(self.outBuf)
