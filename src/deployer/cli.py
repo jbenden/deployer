@@ -45,6 +45,8 @@ from deployer.loader import ordered_load
 from deployer.plugins import hookspec as hookspecs
 from deployer.plugins.top_level import TopLevel
 from deployer.registry import Registry
+from deployer.util import start_reactor
+from deployer.util import stop_reactor
 
 try:
     import colorama                                            # noqa: no-cover
@@ -101,13 +103,23 @@ def _get_plugin_manager(plugins=()):
 
 
 LOGGER = logging.getLogger(__name__)
+THE_REACTOR = None
 
 
 def initialize(level=logging.DEBUG):
     """Perform basic initialization of program."""
+    global THE_REACTOR
+
     setup_logging(level)
     Registry.plugin_manager = _get_plugin_manager()
     Registry.plugin_manager.hook.deployer_register(registry=Registry())
+
+    # start the twisted reactor
+    if THE_REACTOR is None:
+        THE_REACTOR = start_reactor()
+
+        import atexit
+        atexit.register(stop_reactor, THE_REACTOR)
 
 
 @click.group(invoke_without_command=True)

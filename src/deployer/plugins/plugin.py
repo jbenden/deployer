@@ -25,6 +25,8 @@ The module providing the base class of all ```PyDeployer``` plug-ins.
 import logging
 
 from deployer.registry import Registry
+from deployer.util import LoggingSubprocessProtocol
+from deployer.util import sync_spawn_process
 
 from .plugin_proxy import PluginProxy
 
@@ -97,3 +99,9 @@ class Plugin(object):
                 raise FailedValidation(node)
         else:
             raise InvalidNode(node)
+
+    @staticmethod
+    def run(args=()):
+        """Execute another program, and wait until it completes."""
+        process_protocol = LoggingSubprocessProtocol()
+        sync_spawn_process(process_protocol, args)
