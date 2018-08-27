@@ -21,6 +21,7 @@ import logging
 from collections import OrderedDict
 
 from .api import hookimpl
+from .command import Command
 from .echo import Echo
 from .env import Env
 from .matrix import Matrix
@@ -70,6 +71,7 @@ class Fail(Plugin):
 @hookimpl
 def deployer_register(registry):
     """Perform built-in plug-in registrations."""
+    registry.register_plugin('command', Command)
     registry.register_plugin('echo', Echo)
     registry.register_plugin('env', Env)
     registry.register_plugin('fail', Fail)
