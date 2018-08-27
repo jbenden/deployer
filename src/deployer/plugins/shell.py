@@ -84,7 +84,7 @@ class Shell(Plugin):
         if executable not in self.STANDARD_EXECUTABLES:
             self._executable = executable
             self._flags = node['executable_flags'] if 'executable_flags' in node else []
-            self._extension = None
+            self._extension = ''
         else:
             self._executable = self.STANDARD_EXECUTABLES[executable]['executable']
             self._flags = node['executable_flags'] if 'executable_flags' in node else \
