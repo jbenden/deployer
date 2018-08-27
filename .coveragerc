@@ -18,3 +18,4 @@ exclude_lines =
 show_missing = true
 precision = 2
 omit = *migrations*
+    */third_party/*
