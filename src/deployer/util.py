@@ -168,7 +168,10 @@ def sync_spawn_process(process_protocol, argv=(), reactor_process=None):
     output = [None]
 
     def _cb(result):
-        output[0] = result.decode('utf-8').rstrip("\r\n")
+        if hasattr(result, 'decode'):
+            result = result.decode('utf-8')
+
+        output[0] = result.rstrip("\r\n")
         event.set()
 
     def _cbe(result):
