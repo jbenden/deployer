@@ -29,7 +29,7 @@ from deployer.util import sync_check_output
 IS_WINDOWS = sys.platform.lower().startswith('win')
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def reactor(request):
     initialize()
     yield
