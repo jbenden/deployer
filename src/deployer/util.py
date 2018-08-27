@@ -253,9 +253,9 @@ def start_reactor():
 
 def stop_reactor(the_reactor):
     """Stop a running ```Twisted``` reactor."""
-    if the_reactor is None:
-        from twisted.internet import reactor as _reactor
-        the_reactor = _reactor
+    if the_reactor is None:                               # noqa: no-cover
+        from twisted.internet import reactor as _reactor  # noqa: no-cover
+        the_reactor = _reactor                            # noqa: no-cover
 
     def stop(result, stopReactor):
         if stopReactor:                # noqa: no-cover
