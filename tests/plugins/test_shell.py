@@ -81,6 +81,26 @@ def test_plugin_shell_on_unix(caplog, reactor):
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
+def test_plugin_shell_on_unix_with_exact_shell(caplog, reactor):
+    stream = StringIO('''
+    - name: test1
+      shell:
+        script: echo Hello
+        executable: /bin/sh
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string('| Hello'))
+
+
+@pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
 def test_plugin_shell_on_unix_nonzero_return(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
