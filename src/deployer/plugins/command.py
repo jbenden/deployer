@@ -80,7 +80,7 @@ class Command(Plugin):
         result = 'success'
 
         cmd = render(self.cmd, **context.variables.last())
-        argv = shlex.split(cmd, False, True)
+        argv = shlex.split(cmd, False, False)
         LOGGER.debug("Running: %r" % argv)
 
         try:

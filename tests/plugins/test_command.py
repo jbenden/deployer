@@ -118,7 +118,7 @@ def test_plugin_command_on_unix_bad(caplog, reactor):  # noqa: no-cover
 def test_plugin_command_on_win(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
-      command: "\Windows\System32\cmd.exe /c echo Hello world"
+      command: \'\Windows\System32\cmd.exe /c echo Hello world\'
     ''')
     document = loader.ordered_load(stream)
 
