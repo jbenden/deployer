@@ -28,6 +28,7 @@ temporary file is then executed using the specified
 """
 
 import logging
+import sys
 from collections import OrderedDict
 
 from schema import And
@@ -80,7 +81,8 @@ class Shell(Plugin):
 
     def __init__(self, node):
         """Ctor."""
-        executable = node['executable'] if 'executable' in node else 'sh'
+        default = 'cmd' if sys.platform.lower().startswith('win') else 'sh'
+        executable = node['executable'] if 'executable' in node else default
         if executable not in self.STANDARD_EXECUTABLES:
             self._executable = executable
             self._flags = node['executable_flags'] if 'executable_flags' in node else []
