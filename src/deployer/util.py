@@ -124,6 +124,22 @@ class SubprocessProtocol(ProcessProtocol):
             self.d.errback(reason)
 
 
+def async_spawn_process(process_protocol, args, reactor_process=None):
+    """Execute a process using ```Twisted```."""
+    if reactor_process is None:                # noqa: no-cover
+        from twisted.internet import reactor   # noqa: no-cover
+        reactor_process = reactor              # noqa: no-cover
+
+    try:
+        reactor_process.spawnProcess(process_protocol, args[0], args, env=None)
+        return process_protocol.d
+    except OSError as e:
+        if e.errno is None or e.errno == errno.ENOENT:
+            return defer.fail(ProcessTerminated(exitCode=1))
+        else:
+            return defer.fail(e)
+
+
 def async_check_output(args, reactor_process=None):
     """Execute and capture a process'es standard output, using ```Twisted```.
 
@@ -136,14 +152,42 @@ def async_check_output(args, reactor_process=None):
         reactor_process = reactor              # noqa: no-cover
 
     process_protocol = SubprocessProtocol()
-    try:
-        reactor_process.spawnProcess(process_protocol, args[0], args, env=None)
-        return process_protocol.d
-    except OSError as e:
-        if e.errno is None or e.errno == errno.ENOENT:
-            return defer.fail(ProcessTerminated(exitCode=1))
-        else:
-            return defer.fail(e)
+
+    return async_spawn_process(process_protocol, args, reactor_process)
+
+
+def sync_spawn_process(process_protocol, argv=(), reactor_process=None):
+    """Execute and capture a process'es standard output."""
+    if reactor_process is None:                # noqa: no-cover
+        from twisted.internet import reactor   # noqa: no-cover
+        reactor_process = reactor              # noqa: no-cover
+
+    import threading
+
+    event = threading.Event()
+    output = [None]
+
+    def _cb(result):
+        output[0] = result.decode('utf-8').rstrip("\r\n")
+        event.set()
+
+    def _cbe(result):
+        output[0] = result
+        event.set()
+
+    def _main(args):
+        d = async_spawn_process(process_protocol, args, reactor_process)
+        d.addCallback(_cb)
+        d.addErrback(_cbe)
+
+    reactor_process.callFromThread(_main, argv)
+
+    event.wait(None)
+
+    if isinstance(output[0], Failure):
+        output[0].raiseException()
+
+    return output[0]
 
 
 def sync_check_output(argv=(), reactor_process=None):
@@ -206,6 +250,10 @@ def start_reactor():
 
 def stop_reactor(the_reactor):
     """Stop a running ```Twisted``` reactor."""
+    if the_reactor is None:
+        from twisted.internet import reactor as _reactor
+        the_reactor = _reactor
+
     def stop(result, stopReactor):
         if stopReactor:                # noqa: no-cover
             try:                       # noqa: no-cover
