@@ -160,7 +160,8 @@ def execute(pipeline):
 
         try:
             document = ordered_load(f)
-        except:  # noqa: E722
+        except Exception as e:  # noqa: E722
+            LOGGER.exception("Failed validation", e)
             document = None
 
         if TopLevel.valid(document):
