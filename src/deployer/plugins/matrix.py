@@ -24,11 +24,14 @@ The module plug-in providing the ``matrix`` command.
 
 import contextlib
 import logging
+import os
 from collections import OrderedDict
 
 from schema import And
+from schema import Or
 
 from deployer.plugins.plugin_with_tasks import PluginWithTasks
+from deployer.rendering import render
 
 LOGGER = logging.getLogger(__name__)
 
@@ -59,7 +62,7 @@ class Matrix(PluginWithTasks):
     TAG = 'matrix'
 
     SCHEMA = {
-        'tags': [And(str, len)],
+        'tags': Or([And(str, len)], {And(str, len): {And(str, len): And(str, len)}}),
     }
 
     def __init__(self, node):
@@ -88,6 +91,19 @@ class Matrix(PluginWithTasks):
         result = 'success'
 
         for tag in self._tags:
+            if isinstance(self._tags, (dict, OrderedDict)):
+                # we have a dictionary of items.
+                LOGGER.debug("Setting environment variables for tag.")
+                for key, value in self._tags[tag].items():
+                    if context:
+                        value = render(value, **context.variables.last())
+                    else:  # noqa: no-cover
+                        raise RuntimeError("Context is required.")
+
+                    LOGGER.debug("Setting '%s' to '%s', in the system environment.", key, value)
+                    os.putenv(key, value)
+                    os.environ[key] = value
+
             with matrix_scoped_variables(context, tag):
                 LOGGER.debug('Beginning matrix entry: %s', tag)
                 result = self._execute_tasks(context)
