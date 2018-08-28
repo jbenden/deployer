@@ -108,7 +108,7 @@ class Matrix(PluginWithTasks):
                 LOGGER.debug('Beginning matrix entry: %s', tag)
                 result = self._execute_tasks(context)
                 LOGGER.debug('Completed matrix entry: %s', tag)
-            if not result == 'success':
+            if result == 'failure':
                 break
 
         return result
