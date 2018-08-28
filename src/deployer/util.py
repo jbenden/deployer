@@ -170,9 +170,9 @@ def async_spawn_process(process_protocol, args, reactor_process=None):
         return process_protocol.d, process
     except OSError as e:  # noqa: no-cover
         if e.errno is None or e.errno == errno.ENOENT:
-            return defer.fail(ProcessTerminated(exitCode=1))
+            return defer.fail(ProcessTerminated(exitCode=1)), None
         else:
-            return defer.fail(e)
+            return defer.fail(e), None
 
 
 def async_check_output(args, reactor_process=None):
