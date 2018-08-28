@@ -61,7 +61,7 @@ def test_plugin_shell_build():
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
-def test_plugin_shell_timeout_on_unix(caplog, reactor):
+def test_plugin_shell_timeout_on_unix(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
       shell:
@@ -82,7 +82,7 @@ def test_plugin_shell_timeout_on_unix(caplog, reactor):
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
-def test_plugin_shell_silent_on_unix(caplog, reactor):
+def test_plugin_shell_silent_on_unix(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
       shell:
@@ -103,7 +103,7 @@ def test_plugin_shell_silent_on_unix(caplog, reactor):
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
-def test_plugin_shell_on_unix(caplog, reactor):
+def test_plugin_shell_on_unix(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
       shell:
@@ -123,7 +123,7 @@ def test_plugin_shell_on_unix(caplog, reactor):
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
-def test_plugin_shell_on_unix_with_exact_shell(caplog, reactor):
+def test_plugin_shell_on_unix_with_exact_shell(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
       shell:
@@ -248,6 +248,27 @@ def test_plugin_shell_on_win_bad(caplog, reactor):  # noqa: no-cover
       shell:
         script: sdfsdfdsf329909092
         executable: cmd
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string("'failure'"))
+
+
+@pytest.mark.skipif(not IS_WINDOWS, reason='Irrelevant on non-Windows')
+def test_plugin_shell_on_win_bad_with_retry(caplog, reactor):  # noqa: no-cover
+    stream = StringIO('''
+    - name: test1
+      shell:
+        script: sdfsdfdsf329909092
+        executable: cmd
+      attempts: 2
     ''')
     document = loader.ordered_load(stream)
 

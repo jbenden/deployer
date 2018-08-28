@@ -61,7 +61,7 @@ def test_plugin_command_build():
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
-def test_plugin_command_on_unix(caplog, reactor):
+def test_plugin_command_on_unix(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
       command: echo Hello
