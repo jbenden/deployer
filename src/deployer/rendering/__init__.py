@@ -84,7 +84,7 @@ def render(value, **kwargs):
 
     def finalize(value):
         """Our internal Jinja2 finalizer; which recursively renders."""
-        if isinstance(value, string_types) and '{' in value:
+        if isinstance(value, string_types) and any(x in value for x in ['{{', '}}', '{%', '%}']):
             if raw_sentinal in value:
                 value = value.replace(raw_sentinal, '')
                 value = raw_regexp.sub(('{%% raw %%}%s' % raw_sentinal), value)
