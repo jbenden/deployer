@@ -64,9 +64,9 @@ class PluginWithTasks(Plugin):
         for node in self._tasks:
             for plugin in Plugin._recursive_build(node):
                 result = plugin.execute(context)
-                if not result == 'success':
+                if result == 'failure':
                     break
-            if not result == 'success':
+            if result == 'failure':
                 break
 
         return result
