@@ -56,6 +56,40 @@ def merge_dicts(*dict_args):
     return result
 
 
+class FailureLoggingSubprocessProtocol(ProcessProtocol):
+    """Simple Twisted protocol which logs a process'es output."""
+
+    def __init__(self, file):
+        """Constructor."""
+        self.file = file
+        self.d = Deferred()
+
+    def outReceived(self, data):
+        """Triggered upon program `stdout` data arriving."""
+        text = data.decode('utf-8')
+        self.file.write(text)
+
+    def errReceived(self, data):
+        """Triggered upon program `stderr` data arriving."""
+        text = data.decode('utf-8')
+        self.file.write(text)
+
+    def processEnded(self, reason):
+        """Triggered upon the end of a program's execution."""
+        if reason.check(ProcessDone):
+            self.d.callback('')
+        else:
+            # Rewind to the start of our log file.
+            self.file.seek(0)
+
+            # Display the entire log.
+            for line in self.file:
+                LOGGER.warn("| %s" % line)
+
+            # Resolve the deferred.
+            self.d.errback(reason)
+
+
 class LoggingSubprocessProtocol(ProcessProtocol):
     """Simple Twisted protocol which logs a process'es output."""
 

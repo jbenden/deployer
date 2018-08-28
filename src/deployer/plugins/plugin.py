@@ -25,6 +25,8 @@ The module providing the base class of all ```PyDeployer``` plug-ins.
 import logging
 
 from deployer.registry import Registry
+from deployer.third_party.temp import NamedTemporaryFile
+from deployer.util import FailureLoggingSubprocessProtocol
 from deployer.util import LoggingSubprocessProtocol
 from deployer.util import sync_spawn_process
 
@@ -101,7 +103,12 @@ class Plugin(object):
             raise InvalidNode(node)
 
     @staticmethod
-    def run(args=()):
+    def run(args=(), silent=False):
         """Execute another program, and wait until it completes."""
-        process_protocol = LoggingSubprocessProtocol()
-        sync_spawn_process(process_protocol, args)
+        if not silent:
+            process_protocol = LoggingSubprocessProtocol()
+            sync_spawn_process(process_protocol, args)
+        else:
+            with NamedTemporaryFile('w+t', suffix='.log') as f:
+                process_protocol = FailureLoggingSubprocessProtocol(f)
+                sync_spawn_process(process_protocol, args)
