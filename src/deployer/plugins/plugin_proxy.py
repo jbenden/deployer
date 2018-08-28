@@ -50,21 +50,37 @@ def with_scoped_variables(context, item):
 class PluginProxy(Proxy):
     """Wrap-around for all plug-ins."""
 
-    def __init__(self, name, obj, when=None, with_items=None):
+    def __init__(self, name, obj, when=None, with_items=None, attempts=1):
         """Ctor."""
         super(PluginProxy, self).__init__(obj)
         self._name = name
         self._when = when
         self._with_items = with_items
+        self._attempts = attempts
 
     def _execute_one(self, context):
-        LOGGER.info("%s is starting.", self._name)
-        # emit a start event here, events MUST have correlation id
-        start = time.time()
-        result = object.__getattribute__(self, "_obj").execute(context)
-        end = time.time()
-        LOGGER.info("%s has finished with %r, in %0.9f seconds.", self._name, result, (end - start))
-        # emit an end event here
+        result = 'failure'
+        count = 0
+        while count < self._attempts:
+            count += 1
+
+            LOGGER.info("%s is starting.", self._name)
+            # emit a start event here, events MUST have correlation id
+            start = time.time()
+            result = object.__getattribute__(self, "_obj").execute(context)
+            end = time.time()
+            LOGGER.info("%s has finished with %r, in %0.9f seconds.", self._name, result, (end - start))
+            # emit an end event here
+
+            if result == 'failure' and count < self._attempts:
+                LOGGER.warn("Task failed, will retry again. This is the %d time." % count)
+                time.sleep(count * count)
+            elif result == 'failure':
+                break
+
+        if not self._attempts <= 1 and count >= self._attempts:
+            LOGGER.error("Task failed all retry attempts. Aborting with 'failure'.")
+
         return result
 
     def execute(self, context):

@@ -162,6 +162,26 @@ def test_plugin_shell_on_unix_nonzero_return(caplog, reactor):  # noqa: no-cover
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
+def test_plugin_shell_on_unix_nonzero_return_with_retries(caplog, reactor):  # noqa: no-cover
+    stream = StringIO('''
+    - name: test1
+      shell:
+        script: "false"
+      attempts: 2
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string("'failure'"))
+
+
+@pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
 def test_plugin_shell_on_unix_bad(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
