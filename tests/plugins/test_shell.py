@@ -89,6 +89,7 @@ def test_plugin_shell_silent_on_unix(caplog, reactor):  # noqa: no-cover
         script: echo Hello
         executable: bash
         silent: true
+        timeout: 5.0
     ''')
     document = loader.ordered_load(stream)
 
