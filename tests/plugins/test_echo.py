@@ -29,7 +29,6 @@ from deployer.context import Context
 from deployer.plugins import Fail
 from deployer.plugins import TopLevel
 from deployer.plugins.echo import Echo
-from deployer.plugins.matrix import Matrix
 
 
 def test_plugin_fail_invalid():
@@ -151,9 +150,8 @@ def test_plugin_matrix_renders_node(caplog):
 
     context = Context()
 
-    m1 = next(nodes)
-    assert_that(m1, instance_of(Matrix))
-    m1.execute(context)
+    for index, node in enumerate(nodes):
+        node.execute(context)
 
     assert_that(caplog.text, contains_string("| %s" % platform.node()))
 
