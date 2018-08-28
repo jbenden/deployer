@@ -160,6 +160,27 @@ def test_plugin_shell_on_unix_bad(caplog, reactor):  # noqa: no-cover
 
 
 @pytest.mark.skipif(not IS_WINDOWS, reason='Irrelevant on non-Windows')
+def test_plugin_shell_silent_on_win(caplog, reactor):  # noqa: no-cover
+    stream = StringIO('''
+    - name: test1
+      shell:
+        script: \'echo Hello world\'
+        executable: cmd
+        silent: true
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, not contains_string('| Hello world'))
+
+
+@pytest.mark.skipif(not IS_WINDOWS, reason='Irrelevant on non-Windows')
 def test_plugin_shell_on_win(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
