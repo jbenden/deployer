@@ -103,12 +103,12 @@ class Plugin(object):
             raise InvalidNode(node)
 
     @staticmethod
-    def run(args=(), silent=False):
+    def run(args=(), silent=False, timeout=None):
         """Execute another program, and wait until it completes."""
         if not silent:
             process_protocol = LoggingSubprocessProtocol()
-            sync_spawn_process(process_protocol, args)
+            sync_spawn_process(process_protocol, args, timeout=timeout)
         else:
             with NamedTemporaryFile('w+t', suffix='.log') as f:
                 process_protocol = FailureLoggingSubprocessProtocol(f)
-                sync_spawn_process(process_protocol, args)
+                sync_spawn_process(process_protocol, args, timeout=timeout)

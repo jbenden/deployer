@@ -55,6 +55,7 @@ class Shell(Plugin):
         Optional('executable_flags'): [And(str, len)],
         'script': And(str, len),
         Optional('silent'): And(bool),
+        Optional('timeout'): And(float),
     }
 
     STANDARD_EXECUTABLES = {
@@ -96,6 +97,7 @@ class Shell(Plugin):
 
         self._script = node['script']
         self._silent = node['silent'] if 'silent' in node else False
+        self._timeout = node['timeout'] if 'timeout' in node else None
 
     @staticmethod
     def valid(node):
@@ -131,7 +133,7 @@ class Shell(Plugin):
             LOGGER.debug("Running: %r" % f.name)
 
             try:
-                Plugin.run([self._executable] + self._flags + [f.name], silent=self._silent)
+                Plugin.run([self._executable] + self._flags + [f.name], silent=self._silent, timeout=self._timeout)
             except ProcessTerminated as e:
                 LOGGER.error("Process failed and returned %d" % e.exitCode)
                 result = 'failure'

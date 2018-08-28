@@ -34,6 +34,7 @@ from io import BytesIO
 from twisted.internet import defer
 from twisted.internet.defer import Deferred
 from twisted.internet.error import ProcessDone
+from twisted.internet.error import ProcessExitedAlready
 from twisted.internet.error import ProcessTerminated
 from twisted.internet.error import ReactorNotRunning
 from twisted.internet.protocol import ProcessProtocol
@@ -165,8 +166,8 @@ def async_spawn_process(process_protocol, args, reactor_process=None):
         reactor_process = reactor              # noqa: no-cover
 
     try:
-        reactor_process.spawnProcess(process_protocol, args[0], args, env=None)
-        return process_protocol.d
+        process = reactor_process.spawnProcess(process_protocol, args[0], args, env=None)
+        return process_protocol.d, process
     except OSError as e:  # noqa: no-cover
         if e.errno is None or e.errno == errno.ENOENT:
             return defer.fail(ProcessTerminated(exitCode=1))
@@ -190,7 +191,7 @@ def async_check_output(args, reactor_process=None):
     return async_spawn_process(process_protocol, args, reactor_process)
 
 
-def sync_spawn_process(process_protocol, argv=(), reactor_process=None):
+def sync_spawn_process(process_protocol, argv=(), reactor_process=None, timeout=None):
     """Execute and capture a process'es standard output."""
     if reactor_process is None:                # noqa: no-cover
         from twisted.internet import reactor   # noqa: no-cover
@@ -199,7 +200,7 @@ def sync_spawn_process(process_protocol, argv=(), reactor_process=None):
     import threading
 
     event = threading.Event()
-    output = [None]
+    output = [None, None]
 
     def _cb(result):
         if hasattr(result, 'decode'):  # noqa: no-cover
@@ -213,13 +214,26 @@ def sync_spawn_process(process_protocol, argv=(), reactor_process=None):
         event.set()
 
     def _main(args):
-        d = async_spawn_process(process_protocol, args, reactor_process)
+        d, output[1] = async_spawn_process(process_protocol, args, reactor_process)
         d.addCallback(_cb)
         d.addErrback(_cbe)
 
     reactor_process.callFromThread(_main, argv)
 
-    event.wait(None)
+    if event.wait(timeout) is not True:
+        if output[1] is not None:
+            # We timed-out; kill that program!
+            try:
+                output[1].signalProcess('TERM')
+                output[1].signalProcess('KILL')
+            except ProcessExitedAlready:  # noqa: no-cover
+                pass                      # noqa: no-cover
+            output[1].loseConnection()
+
+            # Now raise an exception with the standard exit code for timeout. See timeout(1).
+            raise ProcessTerminated(exitCode=124)
+        else:  # noqa: no-cover
+            LOGGER.error("A time-out occurred without a process handle present.")
 
     if isinstance(output[0], Failure):
         output[0].raiseException()
@@ -236,7 +250,7 @@ def sync_check_output(argv=(), reactor_process=None):
     import threading
 
     event = threading.Event()
-    output = [None]
+    output = [None, None]
 
     def _cb(result):
         output[0] = result.decode('utf-8').rstrip("\r\n")
@@ -247,7 +261,7 @@ def sync_check_output(argv=(), reactor_process=None):
         event.set()
 
     def _main(args):
-        d = async_check_output(args)
+        d, output[1] = async_check_output(args)
         d.addCallback(_cb)
         d.addErrback(_cbe)
 

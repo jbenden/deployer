@@ -61,6 +61,27 @@ def test_plugin_shell_build():
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
+def test_plugin_shell_timeout_on_unix(caplog, reactor):
+    stream = StringIO('''
+    - name: test1
+      shell:
+        script: "sleep 5 && echo Hello"
+        executable: bash
+        timeout: 0.1
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, not contains_string('| Hello'))
+
+
+@pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
 def test_plugin_shell_silent_on_unix(caplog, reactor):
     stream = StringIO('''
     - name: test1
