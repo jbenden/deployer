@@ -60,7 +60,7 @@ except ImportError:                                            # noqa: no-cover
     pass                                                       # noqa: no-cover
 
 
-def setup_logging(level=logging.DEBUG):
+def setup_logging(level=logging.DEBUG):  # noqa: no-cover
     """Initialize the logging infrastructure."""
     root = logging.getLogger()
     root.setLevel(level)
@@ -81,7 +81,7 @@ def setup_logging(level=logging.DEBUG):
     root.addHandler(ch)
 
 
-def _get_plugin_manager(plugins=()):
+def _get_plugin_manager(plugins=()):  # noqa: no-cover
     pm = pluggy.PluginManager('deployer')
     pm.add_hookspecs(hookspecs)
     pm.register(sys.modules[__name__])

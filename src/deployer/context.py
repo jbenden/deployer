@@ -28,34 +28,34 @@ import sys
 from collections import deque
 
 
-class Stack:
+class Stack:  # noqa: no-cover
     """Stack data structure."""
 
-    def __init__(self):
+    def __init__(self):  # noqa: no-cover
         """Ctor."""
         self.__storage = deque()
 
-    def is_empty(self):
+    def is_empty(self):  # noqa: no-cover
         """Determine if the stack is empty."""
         return len(self.__storage) == 0
 
-    def push(self, p):
+    def push(self, p):  # noqa: no-cover
         """Add element to stack."""
         self.__storage.append(p)
 
-    def pop(self):
+    def pop(self):  # noqa: no-cover
         """Remove element from stack."""
         return self.__storage.pop()
 
-    def last(self):
+    def last(self):  # noqa: no-cover
         """Return the right-most element on the stack."""
         return self.__storage[-1]
 
-    def __len__(self):
+    def __len__(self):  # noqa: no-cover
         """Return the number of elements on the stack."""
         return len(self.__storage)
 
-    def push_last(self):
+    def push_last(self):  # noqa: no-cover
         """Re-push the last item on to the stack."""
         self.__storage.append(self.last().copy())
 
@@ -85,7 +85,7 @@ class Context:
         })
 
     @staticmethod
-    def __detect_ncpus():
+    def __detect_ncpus():  # noqa: no-cover
         """Detect the number of effective CPUs in the system."""
         # for Linux, Unix and MacOS
         if hasattr(os, "sysconf"):

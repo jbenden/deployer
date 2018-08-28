@@ -78,7 +78,7 @@ class FailureLoggingSubprocessProtocol(ProcessProtocol):
         """Triggered upon the end of a program's execution."""
         if reason.check(ProcessDone):
             self.d.callback('')
-        else:
+        else:  # noqa: no-cover
             # Rewind to the start of our log file.
             self.file.seek(0)
 
@@ -124,10 +124,10 @@ class LoggingSubprocessProtocol(ProcessProtocol):
 
     def processEnded(self, reason):
         """Triggered upon the end of a program's execution."""
-        if len(self.outBuf):
+        if len(self.outBuf):  # noqa: no-cover
             LOGGER.info("| %s" % self.outBuf)
 
-        if len(self.errBuf):
+        if len(self.errBuf):  # noqa: no-cover
             LOGGER.warn("! %s" % self.errBuf)
 
         if reason.check(ProcessDone):
@@ -167,7 +167,7 @@ def async_spawn_process(process_protocol, args, reactor_process=None):
     try:
         reactor_process.spawnProcess(process_protocol, args[0], args, env=None)
         return process_protocol.d
-    except OSError as e:
+    except OSError as e:  # noqa: no-cover
         if e.errno is None or e.errno == errno.ENOENT:
             return defer.fail(ProcessTerminated(exitCode=1))
         else:
@@ -202,7 +202,7 @@ def sync_spawn_process(process_protocol, argv=(), reactor_process=None):
     output = [None]
 
     def _cb(result):
-        if hasattr(result, 'decode'):
+        if hasattr(result, 'decode'):  # noqa: no-cover
             result = result.decode('utf-8')
 
         output[0] = result.rstrip("\r\n")
