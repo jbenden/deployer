@@ -184,15 +184,13 @@ def validate(pipeline):
     for f in pipeline:
         LOGGER.info("Processing pipeline definition '%s'", f.name)
 
-        valid = False
         try:
             document = ordered_load(f)
-            if TopLevel.valid(document):
-                click.secho('Document is OK.', fg='green')
-                valid = True
         except:  # noqa: E722
-            valid = False
+            document = None
 
-        if not valid:
+        if TopLevel.valid(document):
+            click.secho('Document is OK.', fg='green')
+        else:
             click.secho('Document is BAD.', fg='red')
             sys.exit(1)

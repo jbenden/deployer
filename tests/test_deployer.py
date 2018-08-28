@@ -16,6 +16,9 @@
 import os
 
 from click.testing import CliRunner
+from hamcrest import assert_that
+from hamcrest import contains_string
+from hamcrest import equal_to
 
 from deployer.cli import main
 
@@ -25,6 +28,22 @@ def test_main():
     result = runner.invoke(main, [])
 
     assert result.exit_code == 0
+
+
+def test_main_shows_debugging_messages():
+    runner = CliRunner()
+    result = runner.invoke(main, ['--debug'])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, contains_string('DEBUG'))
+
+
+def test_main_shows_no_messages():
+    runner = CliRunner()
+    result = runner.invoke(main, ['--silent'])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, equal_to(''))
 
 
 def test_validate_with_simple_example():
@@ -52,6 +71,16 @@ def test_exec_with_simple_example():
     result = runner.invoke(main, ['exec', example])
 
     assert result.exit_code == 0
+
+
+def test_exec_with_simple_failure_example():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-failure.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', example])
+
+    assert result.exit_code == 1
 
 
 def test_exec_with_broken_file():
