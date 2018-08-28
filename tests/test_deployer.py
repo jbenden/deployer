@@ -155,8 +155,56 @@ def test_exec_with_simple_matrix_tagging_example_selected_both_tags():
     example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
 
     runner = CliRunner()
-    result = runner.invoke(main, ['exec', '--tag=earth', '--tag=simple', example])
+    result = runner.invoke(main, ['--debug', 'exec', '--tag=earth', '--tag=simple', example])
 
     assert_that(result.exit_code, equal_to(0))
     assert_that(result.output, contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_selected_matrix_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['--debug', 'exec', '--matrix-tags=m*', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_multi_selected_matrix_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['--debug', 'exec', '--matrix-tags=m*,*', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_not_selected_matrix_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['--debug', 'exec', '--matrix-tags=simple', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, not contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_not_selected_empty_matrix_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['--debug', 'exec', '--matrix-tags=', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, not contains_string('Hello World.'))
     assert_that(result.output, contains_string('Hello Earth.'))

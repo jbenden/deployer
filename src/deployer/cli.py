@@ -154,8 +154,11 @@ def main(ctx, debug, silent):
 @main.command('exec')
 @click.option('--tag', '-t', default=[], type=click.STRING, multiple=True, envvar='DEPLOYER_TAG',
               help="Only run tasks having these tags annotated (May be specified more than once.)")
+@click.option('--matrix-tags', '-m', default='', type=click.STRING, envvar='DEPLOYER_MATRIX_TAGS',
+              help="Only run the tasks within a matrix; if the fnmatch-style pattern succeeds "
+                   "(Should be a comma-separated, fnmatch-style pattern.)")
 @click.argument('pipeline', nargs=-1, type=click.File('rb'), required=True, metavar='<path/to/pipeline.yaml>')
-def execute(tag, pipeline):
+def execute(tag, matrix_tags, pipeline):
     """Execute a pipeline definition."""
     for f in pipeline:
         LOGGER.info("Processing pipeline definition '%s'", f.name)
@@ -171,6 +174,11 @@ def execute(tag, pipeline):
 
             context = Context()
             context.tags = tag
+            if isinstance(matrix_tags, six.string_types):
+                context.matrix_tags = [i.strip() for i in matrix_tags.split(',') if i != '']
+            else:  # noqa: no-cover
+                LOGGER.critical("Matrix tags must be a string.")
+                sys.exit(3)
 
             for node in nodes:
                 result = node.execute(context)

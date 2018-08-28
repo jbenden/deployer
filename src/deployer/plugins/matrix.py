@@ -23,6 +23,7 @@ The module plug-in providing the ``matrix`` command.
 """
 
 import contextlib
+import fnmatch
 import logging
 import os
 from collections import OrderedDict
@@ -105,9 +106,22 @@ class Matrix(PluginWithTasks):
                     os.environ[key] = value
 
             with matrix_scoped_variables(context, tag):
-                LOGGER.debug('Beginning matrix entry: %s', tag)
-                result = self._execute_tasks(context)
-                LOGGER.debug('Completed matrix entry: %s', tag)
+                matrix_list = []
+                matrix_tags = []
+                if context and len(context.matrix_tags) > 0:
+                    matrix_list = context.variables.last()[
+                        'matrix_list'] if 'matrix_list' in context.variables.last() else []
+                    matrix_tags = context.matrix_tags
+
+                if len(matrix_tags) > 0 and not all(
+                        [fnmatch.fnmatch(x[1], x[0]) for x in zip(matrix_tags, matrix_list)]):
+                    LOGGER.debug("Skipping because this matrix item does not have a user-selected matrix tag.")
+                    LOGGER.debug("matrix_list=%r matrix_tags=%r", matrix_list, matrix_tags)
+                    result = 'skipped'
+                else:
+                    LOGGER.debug('Beginning matrix entry: %s', tag)
+                    result = self._execute_tasks(context)
+                    LOGGER.debug('Completed matrix entry: %s', tag)
 
             if isinstance(self._tags, (dict, OrderedDict)):
                 # we have a dictionary of items.

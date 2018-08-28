@@ -67,10 +67,13 @@ class Context(object):
 
     tags = None  # User selected tags to filter.
 
+    matrix_tags = None  # User selected `matrix` tags to filter.
+
     def __init__(self):
         """Ctor."""
         # create our basic variables
         self.__class__.tags = []
+        self.__class__.matrix_tags = []
 
         # create our variable stack
         self.__class__.variables = Stack()
