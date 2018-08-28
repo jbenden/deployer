@@ -108,6 +108,17 @@ class Matrix(PluginWithTasks):
                 LOGGER.debug('Beginning matrix entry: %s', tag)
                 result = self._execute_tasks(context)
                 LOGGER.debug('Completed matrix entry: %s', tag)
+
+            if isinstance(self._tags, (dict, OrderedDict)):
+                # we have a dictionary of items.
+                LOGGER.debug("Unsetting environment variables for tag.")
+                for key, _ in self._tags[tag].items():
+                    try:
+                        os.unsetenv(key)
+                    except AttributeError:                               # noqa: no-cover
+                        pass                                             # noqa: no-cover
+                    del os.environ[key]
+
             if result == 'failure':
                 break
 
