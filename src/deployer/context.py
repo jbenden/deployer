@@ -60,13 +60,18 @@ class Stack:  # noqa: no-cover
         self.__storage.append(self.last().copy())
 
 
-class Context:
+class Context(object):
     """Data container for pipeline state."""
 
     variables = None
 
+    tags = None  # User selected tags to filter.
+
     def __init__(self):
         """Ctor."""
+        # create our basic variables
+        self.__class__.tags = []
+
         # create our variable stack
         self.__class__.variables = Stack()
 

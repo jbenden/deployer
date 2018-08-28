@@ -1,0 +1,16 @@
+---
+
+- matrix:
+    tags:
+      - m1
+    tasks:
+      - name: First test
+        echo: Hello World.
+  tags:
+    - simple
+
+- name: Second test
+  echo: Hello Earth.
+  tags:
+    - earth
+

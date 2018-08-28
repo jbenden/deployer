@@ -152,8 +152,10 @@ def main(ctx, debug, silent):
 
 
 @main.command('exec')
+@click.option('--tag', '-t', default=[], type=click.STRING, multiple=True, envvar='DEPLOYER_TAG',
+              help="Only run tasks having these tags annotated (May be specified more than once.)")
 @click.argument('pipeline', nargs=-1, type=click.File('rb'), required=True, metavar='<path/to/pipeline.yaml>')
-def execute(pipeline):
+def execute(tag, pipeline):
     """Execute a pipeline definition."""
     for f in pipeline:
         LOGGER.info("Processing pipeline definition '%s'", f.name)
@@ -168,6 +170,7 @@ def execute(pipeline):
             nodes = TopLevel.build(document)
 
             context = Context()
+            context.tags = tag
 
             for node in nodes:
                 result = node.execute(context)

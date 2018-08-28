@@ -50,13 +50,14 @@ def with_scoped_variables(context, item):
 class PluginProxy(Proxy):
     """Wrap-around for all plug-ins."""
 
-    def __init__(self, name, obj, when=None, with_items=None, attempts=1):
+    def __init__(self, name, obj, when=None, with_items=None, attempts=1, tags=[]):
         """Ctor."""
         super(PluginProxy, self).__init__(obj)
         self._name = name
         self._when = when
         self._with_items = with_items
         self._attempts = attempts
+        self._match_tags = tags
 
     def _execute_one(self, context):
         result = 'failure'
@@ -86,6 +87,16 @@ class PluginProxy(Proxy):
     def execute(self, context):
         """Proxy of a plug-in's `execute` method."""
         result = 'failed'
+
+        if context and len(self._match_tags) > 0 and len(context.tags) > 0:
+            found = False
+            for tag in context.tags:
+                if tag in self._match_tags:
+                    found = True
+
+            if not found:
+                LOGGER.debug("Skipping because this item does not have a user-selected tag.")
+                return 'skipped'
 
         if self._when is not None:
             expr = BooleanExpression(self._when)

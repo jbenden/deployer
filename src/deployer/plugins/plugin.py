@@ -62,6 +62,8 @@ class FailedValidation(RuntimeError):
 class Plugin(object):
     """The base class of all ```PyDeployer``` plug-ins."""
 
+    _match_tags = []
+
     @staticmethod
     def _find_matching_plugin_for_node(node):
         """Locate a plug-in which handles the specified `node`; else returns `None`."""
@@ -86,7 +88,7 @@ class Plugin(object):
             return False
 
     @staticmethod
-    def _recursive_build(node):
+    def _recursive_build(node, inherited_tags=()):
         # find a workable plugin
         plugin = Plugin._find_matching_plugin_for_node(node)
         if plugin:
@@ -96,8 +98,10 @@ class Plugin(object):
                 when = node['when'] if 'when' in node else None
                 with_items = node['with_items'] if 'with_items' in node else None
                 attempts = node['attempts'] if 'attempts' in node else 1
+                tags = node['tags'] if 'tags' in node else []
+                tags.extend(inherited_tags)
                 for sub_node in plugin.build(node):
-                    yield PluginProxy(name, sub_node, when=when, with_items=with_items, attempts=attempts)
+                    yield PluginProxy(name, sub_node, when=when, with_items=with_items, attempts=attempts, tags=tags)
             else:
                 raise FailedValidation(node)
         else:

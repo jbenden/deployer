@@ -88,3 +88,75 @@ def test_exec_with_broken_file():
     result = runner.invoke(main, ['exec', __file__])
 
     assert result.exit_code == 2
+
+
+def test_exec_with_simple_tagging_example_selected_simple_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', '--tag=simple', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, contains_string('Hello World.'))
+    assert_that(result.output, not contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_tagging_example_selected_earth_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', '--tag=earth', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, not contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_tagging_example_selected_both_tags():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', '--tag=earth', '--tag=simple', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_selected_simple_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', '--tag=simple', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, contains_string('Hello World.'))
+    assert_that(result.output, not contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_selected_earth_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', '--tag=earth', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, not contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_selected_both_tags():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['exec', '--tag=earth', '--tag=simple', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, contains_string('Hello World.'))
+    assert_that(result.output, contains_string('Hello Earth.'))
