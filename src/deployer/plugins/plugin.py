@@ -112,8 +112,8 @@ class Plugin(object):
         """Execute another program, and wait until it completes."""
         if not silent:
             process_protocol = LoggingSubprocessProtocol()
-            sync_spawn_process(process_protocol, args, timeout=timeout)
+            return sync_spawn_process(process_protocol, args, timeout=timeout)
         else:
             with NamedTemporaryFile('w+t', suffix='.log') as f:
                 process_protocol = FailureLoggingSubprocessProtocol(f)
-                sync_spawn_process(process_protocol, args, timeout=timeout)
+                return sync_spawn_process(process_protocol, args, timeout=timeout)
