@@ -34,6 +34,10 @@ class Result(dict):
         """Cast to boolean."""
         return self.__bool__()  # noqa: no-cover
 
+    def __str__(self):
+        """Return our `stdout` if present, otherwise returns the `result` value."""
+        return self['stdout'] if 'stdout' in self else str(self['result'])
+
     def failed(self):
         """Determine if the resultant is a failure."""
         return self['result'] == 'failure'  # noqa: no-cover

@@ -136,6 +136,28 @@ def test_plugin_command_with_register_on_unix(caplog, reactor):  # noqa: no-cove
     assert_that(caplog.text, contains_string('--Hello--'))
 
 
+@pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
+def test_plugin_command_with_register_result_on_unix(caplog, reactor):  # noqa: no-cover
+    stream = StringIO('''
+    - name: test1
+      command: echo Hello
+      register: test1
+
+    - name: result1
+      echo: "--{{ test1 }}--"
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string('--Hello--'))
+
+
 @pytest.mark.skipif(not IS_WINDOWS, reason='Irrelevant on non-Windows')
 def test_plugin_command_on_win(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
@@ -181,6 +203,28 @@ def test_plugin_command_with_register_on_win(caplog, reactor):  # noqa: no-cover
 
     - name: result1
       echo: "--{{ test1.stdout }}--"
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string('--Hello world--'))
+
+
+@pytest.mark.skipif(not IS_WINDOWS, reason='Irrelevant on non-Windows')
+def test_plugin_command_with_register_result_on_win(caplog, reactor):  # noqa: no-cover
+    stream = StringIO('''
+    - name: test1
+      command: \'\Windows\System32\cmd.exe /c echo Hello world\'
+      register: test1
+
+    - name: result1
+      echo: "--{{ test1 }}--"
     ''')
     document = loader.ordered_load(stream)
 
