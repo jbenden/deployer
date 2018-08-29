@@ -26,6 +26,7 @@ import logging
 from collections import OrderedDict
 
 from deployer.rendering import render
+from deployer.result import Result
 
 from .plugin import Plugin
 
@@ -65,4 +66,4 @@ class Echo(Plugin):
             msg = self.msg
 
         LOGGER.info("| %s", msg)
-        return 'success'
+        return Result(result='success')

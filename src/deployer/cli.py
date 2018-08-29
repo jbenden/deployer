@@ -183,7 +183,7 @@ def execute(tag, matrix_tags, pipeline):
             for node in nodes:
                 result = node.execute(context)
 
-                if result == 'failure':
+                if not result:
                     sys.exit(1)
         else:
             sys.exit(2)

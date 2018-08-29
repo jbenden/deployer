@@ -37,6 +37,7 @@ from schema import SchemaError
 from twisted.internet.error import ProcessTerminated
 
 from deployer.rendering import render
+from deployer.result import Result
 
 from .plugin import Plugin
 
@@ -77,7 +78,7 @@ class Command(Plugin):
 
     def execute(self, context):
         """Perform the plugin's task purpose."""
-        result = 'success'
+        result = Result(result='success')
 
         cmd = render(self.cmd, **context.variables.last())
         argv = shlex.split(cmd, False, False)
@@ -87,6 +88,6 @@ class Command(Plugin):
             Plugin.run(argv)
         except ProcessTerminated as e:
             LOGGER.error("Process failed and returned %d" % e.exitCode)
-            result = 'failure'
+            result = Result(result='failure')
 
         return result

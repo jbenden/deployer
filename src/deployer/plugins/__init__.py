@@ -20,6 +20,8 @@
 import logging
 from collections import OrderedDict
 
+from deployer.result import Result
+
 from .api import hookimpl
 from .command import Command
 from .echo import Echo
@@ -67,7 +69,7 @@ class Fail(Plugin):
         else:
             msg = self.fail
         LOGGER.error("| %s", msg)
-        return 'failure'
+        return Result(result='failure')
 
 
 @hookimpl

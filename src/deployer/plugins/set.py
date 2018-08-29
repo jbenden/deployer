@@ -29,6 +29,8 @@ from schema import And
 from schema import Schema
 from schema import SchemaError
 
+from deployer.result import Result
+
 from .plugin import Plugin
 
 LOGGER = logging.getLogger(__name__)
@@ -74,4 +76,4 @@ class Set(Plugin):
         for key, value in self.variables.items():
             LOGGER.debug("Setting '%s' to '%s', in the templating environment.", key, value)
             context.variables.last()[key] = value
-        return 'success'
+        return Result(result='success')

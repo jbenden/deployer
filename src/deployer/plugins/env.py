@@ -34,6 +34,7 @@ from schema import Schema
 from schema import SchemaError
 
 from deployer.rendering import render
+from deployer.result import Result
 
 from .plugin import Plugin
 
@@ -103,4 +104,4 @@ class Env(Plugin):
             LOGGER.debug("Setting '%s' to '%s', in the system environment.", key, value)
             os.putenv(key, value)
             os.environ[key] = value
-        return 'success'
+        return Result(result='success')

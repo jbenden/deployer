@@ -33,6 +33,7 @@ from schema import Or
 
 from deployer.plugins.plugin_with_tasks import PluginWithTasks
 from deployer.rendering import render
+from deployer.result import Result
 
 LOGGER = logging.getLogger(__name__)
 
@@ -89,7 +90,7 @@ class Matrix(PluginWithTasks):
 
     def execute(self, context):
         """Perform the plugin's task purpose."""
-        result = 'success'
+        result = Result(result='success')
 
         for tag in self._tags:
             if isinstance(self._tags, (dict, OrderedDict)):
@@ -133,7 +134,7 @@ class Matrix(PluginWithTasks):
                         pass                                             # noqa: no-cover
                     del os.environ[key]
 
-            if result == 'failure':
+            if not result:
                 break
 
         return result

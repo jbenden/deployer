@@ -27,6 +27,7 @@ import logging
 from schema import Schema
 from schema import SchemaError
 
+from deployer.result import Result
 from deployer.util import merge_dicts
 
 from .plugin import Plugin
@@ -59,14 +60,14 @@ class PluginWithTasks(Plugin):
         return True
 
     def _execute_tasks(self, context):
-        result = 'success'
+        result = Result(result='success')
 
         for node in self._tasks:
             for plugin in Plugin._recursive_build(node, inherited_tags=self._match_tags):
                 result = plugin.execute(context)
-                if result == 'failure':
+                if not result:
                     break
-            if result == 'failure':
+            if not result:
                 break
 
         return result

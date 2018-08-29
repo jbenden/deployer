@@ -28,6 +28,7 @@ import time
 
 from deployer.proxy import Proxy
 from deployer.rendering import BooleanExpression
+from deployer.result import Result
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ class PluginProxy(Proxy):
         self._match_tags = tags
 
     def _execute_one(self, context):
-        result = 'failure'
+        result = Result(result='failure')
         count = 0
         while count < self._attempts:
             count += 1
@@ -73,10 +74,10 @@ class PluginProxy(Proxy):
             LOGGER.info("%s has finished with %r, in %0.9f seconds.", self._name, result, (end - start))
             # emit an end event here
 
-            if result == 'failure' and count < self._attempts:
+            if not result and count < self._attempts:
                 LOGGER.warn("Task failed, will retry again. This is the %d time." % count)
                 time.sleep(count * count)
-            elif result == 'failure':
+            elif not result:
                 break
 
         if not self._attempts <= 1 and count >= self._attempts:
@@ -86,7 +87,7 @@ class PluginProxy(Proxy):
 
     def execute(self, context):
         """Proxy of a plug-in's `execute` method."""
-        result = 'failed'
+        result = Result(result='failed')
 
         if context and len(self._match_tags) > 0 and len(context.tags) > 0:
             found = False
@@ -96,19 +97,19 @@ class PluginProxy(Proxy):
 
             if not found:
                 LOGGER.debug("Skipping because this item does not have a user-selected tag.")
-                return 'skipped'
+                return Result(result='skipped')
 
         if self._when is not None:
             expr = BooleanExpression(self._when)
 
             if not expr.evaluate(context):
-                return 'skipped'
+                return Result(result='skipped')
 
         if self._with_items is not None:
             for item in self._with_items:
                 with with_scoped_variables(context, item):
                     result = self._execute_one(context)
-                    if result == 'failure':
+                    if not result:
                         break
         else:
             result = self._execute_one(context)
