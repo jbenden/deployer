@@ -65,5 +65,7 @@ class Echo(Plugin):
         else:
             msg = self.msg
 
-        LOGGER.info("| %s", msg)
+        for line in msg.splitlines(False):
+            LOGGER.info("| %s", line)
+
         return Result(result='success')
