@@ -65,6 +65,8 @@ class Context(object):
 
     variables = None
 
+    args = None  # User passed arguments to pipeline.
+
     tags = None  # User selected tags to filter.
 
     matrix_tags = None  # User selected `matrix` tags to filter.
@@ -72,6 +74,7 @@ class Context(object):
     def __init__(self):
         """Ctor."""
         # create our basic variables
+        self.__class__.args = []
         self.__class__.tags = []
         self.__class__.matrix_tags = []
 
@@ -80,6 +83,7 @@ class Context(object):
 
         # add the default set of templating variables.
         self.__class__.variables.push({
+            'args': self.__class__.args,
             'nbcpus': self.__class__.__detect_ncpus(),
             'node': platform.node(),
             'platform': sys.platform.lower(),
