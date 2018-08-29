@@ -26,6 +26,7 @@ from .echo import Echo
 from .env import Env
 from .matrix import Matrix
 from .plugin import Plugin
+from .set import Set
 from .shell import Shell
 from .stage import Stage
 from .top_level import TopLevel
@@ -77,5 +78,6 @@ def deployer_register(registry):
     registry.register_plugin('env', Env)
     registry.register_plugin('fail', Fail)
     registry.register_plugin('matrix', Matrix)
+    registry.register_plugin('set', Set)
     registry.register_plugin('shell', Shell)
     registry.register_plugin('stage', Stage)
