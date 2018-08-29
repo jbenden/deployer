@@ -72,7 +72,7 @@ class PluginProxy(Proxy):
             start = time.time()
             result = object.__getattribute__(self, "_obj").execute(context)
             end = time.time()
-            LOGGER.info("%s has finished with %r, in %0.9f seconds.", self._name, result, (end - start))
+            LOGGER.info("%s has finished with %r, in %0.9f seconds.", self._name, result['result'], (end - start))
             # emit an end event here
 
             if not result and count < self._attempts:
