@@ -79,7 +79,7 @@ class Stage(PluginWithTasks):
     def execute(self, context):
         """Perform the plugin's task purpose."""
         with scoped_variables(context, self._scope):
-            LOGGER.debug('Beginning stage')
+            LOGGER.debug('Beginning stage%s' % (' (with scope)' if self._scope else ''))
             result = self._execute_tasks(context)
             LOGGER.debug('Completed stage')
 

@@ -96,3 +96,27 @@ def test_plugin_stage_fails_inner_task_with_context(caplog):
         node.execute(context)
 
     assert_that(caplog.text, contains_string('Exiting with style'))
+
+
+def test_plugin_stage_does_not_create_scope(caplog):
+    stream = StringIO('''
+    - name: test1
+      stage:
+        scope: false
+        tasks:
+          - set:
+              joe: benden
+
+    - name: test2
+      echo: "{{ joe }}"
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string('| benden'))
