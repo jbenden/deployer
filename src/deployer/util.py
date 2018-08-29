@@ -29,6 +29,7 @@ from __future__ import print_function
 import errno
 import logging
 import sys
+from collections import deque
 from io import BytesIO
 
 from twisted.internet import defer
@@ -60,15 +61,19 @@ def merge_dicts(*dict_args):
 class FailureLoggingSubprocessProtocol(ProcessProtocol):
     """Simple Twisted protocol which logs a process'es output."""
 
+    capBuf = None
+
     def __init__(self, file):
         """Constructor."""
         self.file = file
         self.d = Deferred()
+        self.capBuf = deque('', 1024 * 1024)
 
     def outReceived(self, data):
         """Triggered upon program `stdout` data arriving."""
         text = data.decode('utf-8')
         self.file.write(text)
+        self.capBuf.append(text)
 
     def errReceived(self, data):
         """Triggered upon program `stderr` data arriving."""
@@ -78,7 +83,7 @@ class FailureLoggingSubprocessProtocol(ProcessProtocol):
     def processEnded(self, reason):
         """Triggered upon the end of a program's execution."""
         if reason.check(ProcessDone):
-            self.d.callback('')
+            self.d.callback(''.join(self.capBuf))
         else:  # noqa: no-cover
             # Rewind to the start of our log file.
             self.file.seek(0)
@@ -94,17 +99,20 @@ class FailureLoggingSubprocessProtocol(ProcessProtocol):
 class LoggingSubprocessProtocol(ProcessProtocol):
     """Simple Twisted protocol which logs a process'es output."""
 
+    capBuf = None
     outBuf = ''
     errBuf = ''
 
     def connectionMade(self):
         """Triggered upon program start, as it is entering its' `main` function."""
         self.d = Deferred()
+        self.capBuf = deque('', 1024 * 1024)
 
     def outReceived(self, data):
         """Triggered upon program `stdout` data arriving."""
         text = data.decode('utf-8')
         self.outBuf += text
+        self.capBuf.append(text)
 
         pos = self.outBuf.find("\n")
         while pos >= 0:
@@ -132,7 +140,7 @@ class LoggingSubprocessProtocol(ProcessProtocol):
             LOGGER.warn("! %s" % self.errBuf)
 
         if reason.check(ProcessDone):
-            self.d.callback(self.outBuf)
+            self.d.callback(''.join(self.capBuf))
         else:
             self.d.errback(reason)
 
