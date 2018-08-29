@@ -118,7 +118,7 @@ class Matrix(PluginWithTasks):
                         [fnmatch.fnmatch(x[1], x[0]) for x in zip(matrix_tags, matrix_list)]):
                     LOGGER.debug("Skipping because this matrix item does not have a user-selected matrix tag.")
                     LOGGER.debug("matrix_list=%r matrix_tags=%r", matrix_list, matrix_tags)
-                    result = 'skipped'
+                    result = Result(result='skipped')
                 else:
                     LOGGER.debug('Beginning matrix entry: %s', tag)
                     result = self._execute_tasks(context)
