@@ -85,7 +85,7 @@ class Command(Plugin):
         LOGGER.debug("Running: %r" % argv)
 
         try:
-            Plugin.run(argv)
+            result['stdout'] = Plugin.run(argv)
         except ProcessTerminated as e:
             LOGGER.error("Process failed and returned %d" % e.exitCode)
             result = Result(result='failure')

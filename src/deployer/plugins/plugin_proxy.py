@@ -51,7 +51,7 @@ def with_scoped_variables(context, item):
 class PluginProxy(Proxy):
     """Wrap-around for all plug-ins."""
 
-    def __init__(self, name, obj, when=None, with_items=None, attempts=1, tags=[]):
+    def __init__(self, name, obj, when=None, with_items=None, attempts=1, tags=[], register=None):
         """Ctor."""
         super(PluginProxy, self).__init__(obj)
         self._name = name
@@ -59,6 +59,7 @@ class PluginProxy(Proxy):
         self._with_items = with_items
         self._attempts = attempts
         self._match_tags = tags
+        self._register = register
 
     def _execute_one(self, context):
         result = Result(result='failure')
@@ -82,6 +83,9 @@ class PluginProxy(Proxy):
 
         if not self._attempts <= 1 and count >= self._attempts:
             LOGGER.error("Task failed all retry attempts. Aborting with 'failure'.")
+        else:
+            if self._register is not None and context:
+                context.variables.last()[self._register] = result
 
         return result
 

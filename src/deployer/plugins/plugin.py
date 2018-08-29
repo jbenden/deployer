@@ -98,10 +98,11 @@ class Plugin(object):
                 when = node['when'] if 'when' in node else None
                 with_items = node['with_items'] if 'with_items' in node else None
                 attempts = node['attempts'] if 'attempts' in node else 1
+                register = node['register'] if 'register' in node else None
                 tags = node['tags'] if 'tags' in node else []
                 tags.extend(inherited_tags)
                 for sub_node in plugin.build(node):
-                    yield PluginProxy(name, sub_node, when=when, with_items=with_items, attempts=attempts, tags=tags)
+                    yield PluginProxy(name, sub_node, when=when, with_items=with_items, attempts=attempts, tags=tags, register=register)
             else:
                 raise FailedValidation(node)
         else:

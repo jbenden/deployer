@@ -134,7 +134,7 @@ class Shell(Plugin):
             LOGGER.debug("Running: %r" % f.name)
 
             try:
-                Plugin.run([self._executable] + self._flags + [f.name], silent=self._silent, timeout=self._timeout)
+                result['stdout'] = Plugin.run([self._executable] + self._flags + [f.name], silent=self._silent, timeout=self._timeout)
             except ProcessTerminated as e:
                 LOGGER.error("Process failed and returned %d" % e.exitCode)
                 result = Result(result='failure')
