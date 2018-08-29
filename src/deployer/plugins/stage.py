@@ -26,20 +26,23 @@ import contextlib
 import logging
 from collections import OrderedDict
 
+from schema import And
+from schema import Optional
+
 from deployer.plugins.plugin_with_tasks import PluginWithTasks
 
 LOGGER = logging.getLogger(__name__)
 
 
 @contextlib.contextmanager
-def scoped_variables(context):
+def scoped_variables(context, scope):
     """Ensure all variables introduced by a plug-in are scoped to itself."""
-    if context:
+    if context and scope:
         context.variables.push_last()
     try:
         yield
     finally:
-        if context:
+        if context and scope:
             context.variables.pop()
 
 
@@ -48,9 +51,14 @@ class Stage(PluginWithTasks):
 
     TAG = 'stage'
 
+    SCHEMA = {
+        Optional('scope'): And(bool),
+    }
+
     def __init__(self, node):
         """Ctor."""
         super(Stage, self).__init__(node)
+        self._scope = node['scope'] if 'scope' in node else True
 
     @staticmethod
     def valid(node):
@@ -61,7 +69,7 @@ class Stage(PluginWithTasks):
         if Stage.TAG not in node:
             return False
 
-        return PluginWithTasks._valid({}, Stage.TAG, node)
+        return PluginWithTasks._valid(Stage.SCHEMA, Stage.TAG, node)
 
     @staticmethod
     def build(node):
@@ -70,7 +78,7 @@ class Stage(PluginWithTasks):
 
     def execute(self, context):
         """Perform the plugin's task purpose."""
-        with scoped_variables(context):
+        with scoped_variables(context, self._scope):
             LOGGER.debug('Beginning stage')
             result = self._execute_tasks(context)
             LOGGER.debug('Completed stage')
