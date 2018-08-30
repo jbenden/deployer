@@ -16,13 +16,11 @@
 from hamcrest import assert_that
 from hamcrest import equal_to
 from hamcrest import instance_of
-from hamcrest import starts_with
 from six import StringIO
 
 from deployer import loader
 from deployer.cli import initialize
 from deployer.plugins import TopLevel
-from deployer.plugins.echo import Echo
 
 
 def test_top_level_is_a_list():
@@ -77,5 +75,4 @@ def test_top_level_is_created():
     nodes = TopLevel.build(document)
 
     for node in nodes:
-        assert_that(node, instance_of(Echo))
-        assert_that(node.msg, starts_with("hi"))
+        assert_that(node, instance_of(TopLevel))

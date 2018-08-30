@@ -153,7 +153,6 @@ def test_plugin_echo_renders_node(capenv):
 
     context = Context()
 
-    assert_that(node, instance_of(Env))
     node.execute(context)
 
     assert_that(os.getenv('Joe', None), equal_to(platform.node()))

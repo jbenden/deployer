@@ -52,8 +52,7 @@ def test_plugin_top_level_is_created():
     nodes = TopLevel.build(document)
 
     for node in nodes:
-        assert_that(node, instance_of(Echo))
-        assert_that(node.msg, starts_with("hi"))
+        assert_that(node, instance_of(TopLevel))
 
 
 def test_plugin_echo_invalid():
@@ -93,12 +92,11 @@ def test_plugin_top_level_produces_logging(caplog):
     nodes = TopLevel.build(document)
 
     for index, node in enumerate(nodes):
-        assert_that(node, instance_of(Echo))
         node.execute(None)
 
-        assert_that(len(caplog.records), equal_to(3))
-        assert_that(caplog.records[0].message, starts_with("test%d is starting" % index))
-        assert_that(caplog.records[2].message, starts_with("test%d has finished" % index))
+        assert_that(len(caplog.records), equal_to(11))
+        assert_that(caplog.records[1].message, starts_with("test%d is starting" % index))
+        assert_that(caplog.records[3].message, starts_with("test%d has finished" % index))
 
         caplog.clear()
 
@@ -119,13 +117,12 @@ def test_plugin_echo_renders_node(caplog):
     context = Context()
 
     for index, node in enumerate(nodes):
-        assert_that(node, instance_of(Echo))
         node.execute(context)
 
-        assert_that(len(caplog.records), equal_to(3))
-        assert_that(caplog.records[0].message, starts_with("test%d is starting" % index))
-        assert_that(caplog.records[1].message, starts_with("| %s" % platform.node()))
-        assert_that(caplog.records[2].message, starts_with("test%d has finished" % index))
+        assert_that(len(caplog.records), equal_to(11))
+        assert_that(caplog.records[1].message, starts_with("test%d is starting" % index))
+        assert_that(caplog.records[2].message, starts_with("| %s" % platform.node()))
+        assert_that(caplog.records[3].message, starts_with("test%d has finished" % index))
 
         caplog.clear()
 
@@ -169,10 +166,9 @@ def test_plugin_echo_with_false_when(caplog):
     context = Context()
 
     for index, node in enumerate(nodes):
-        assert_that(node, instance_of(Echo))
         node.execute(context)
 
-        assert_that(len(caplog.records), equal_to(0))
+        assert_that(len(caplog.records), equal_to(2))
 
 
 def test_plugin_echo_with_true_when(caplog):
@@ -188,10 +184,9 @@ def test_plugin_echo_with_true_when(caplog):
     context = Context()
 
     for index, node in enumerate(nodes):
-        assert_that(node, instance_of(Echo))
         node.execute(context)
 
-        assert_that(len(caplog.records), equal_to(3))
+        assert_that(len(caplog.records), equal_to(5))
 
 
 def test_plugin_echo_with_simple_when(caplog):
@@ -207,10 +202,9 @@ def test_plugin_echo_with_simple_when(caplog):
     context = Context()
 
     for index, node in enumerate(nodes):
-        assert_that(node, instance_of(Echo))
         node.execute(context)
 
-        assert_that(len(caplog.records), equal_to(0))
+        assert_that(len(caplog.records), equal_to(2))
 
 
 def test_plugin_echo_renders_multiple_items(caplog):
@@ -229,10 +223,9 @@ def test_plugin_echo_renders_multiple_items(caplog):
     context = Context()
 
     for index, node in enumerate(nodes):
-        assert_that(node, instance_of(Echo))
         node.execute(context)
 
-    assert_that(len(caplog.records), equal_to(9))
+    assert_that(len(caplog.records), equal_to(11))
     assert_that(caplog.text, contains_string("| a-0"))
     assert_that(caplog.text, contains_string("| b-0"))
     assert_that(caplog.text, contains_string("| c-0"))
@@ -256,7 +249,7 @@ def test_plugin_fail_renders_multiple_items(caplog):
     for index, node in enumerate(nodes):
         node.execute(context)
 
-    assert_that(len(caplog.records), equal_to(3))
+    assert_that(len(caplog.records), equal_to(5))
     assert_that(caplog.text, contains_string("| a-0"))
     assert_that(caplog.text, not contains_string("| b-0"))
     assert_that(caplog.text, not contains_string("| c-0"))
@@ -278,5 +271,5 @@ def test_plugin_fail_fails_rendering_multiple_items_without_a_context(caplog):
     for index, node in enumerate(nodes):
         node.execute(None)
 
-    assert_that(len(caplog.records), equal_to(3))
+    assert_that(len(caplog.records), equal_to(5))
     assert_that(caplog.text, contains_string("{{ item }}"))

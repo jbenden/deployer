@@ -23,6 +23,9 @@ The top-level object, representing an entire ```PyDeployer``` pipeline.
 """
 
 import logging
+import time
+
+from deployer.result import Result
 
 from .plugin import Plugin
 
@@ -31,6 +34,10 @@ LOGGER = logging.getLogger(__name__)
 
 class TopLevel(Plugin):
     """The very top most object of a whole pipeline."""
+
+    def __init__(self, document):
+        """Constructor."""
+        self._document = document
 
     @staticmethod
     def valid(document):
@@ -47,6 +54,22 @@ class TopLevel(Plugin):
     @staticmethod
     def build(document):
         """Produce an iterable AST representation of a YAML pipeline definition."""
-        for node in document:
+        yield TopLevel(document)
+
+    def execute(self, context):
+        """Perform the plugin's task purpose."""
+        result = Result(result='success')
+
+        LOGGER.info("Starting pipeline execution.")
+        start = time.time()
+
+        for node in self._document:
             for plugin in Plugin._recursive_build(node):
-                yield plugin
+                result = plugin.execute(context)
+                if not result:
+                    break
+
+        end = time.time()
+        LOGGER.info("Finished pipeline execution in %0.9f seconds.", (end - start))
+
+        return result

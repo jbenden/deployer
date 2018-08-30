@@ -18,34 +18,11 @@ from collections import OrderedDict
 from hamcrest import assert_that
 from hamcrest import calling
 from hamcrest import equal_to
-from hamcrest import instance_of
 from hamcrest import raises
-from hamcrest import starts_with
 from six import StringIO
 
 from deployer import loader
-from deployer.cli import initialize
 from deployer.plugins import TopLevel
-from deployer.plugins.echo import Echo
-
-
-def test_plugin_top_level_is_created():
-    initialize()
-    stream = StringIO('''
-    - name: test1
-      echo: hi1
-    - name: test2
-      echo: hi2
-    - name: test3
-      echo: hi3
-    ''')
-    document = loader.ordered_load(stream)
-
-    nodes = TopLevel.build(document)
-
-    for node in nodes:
-        assert_that(node, instance_of(Echo))
-        assert_that(node.msg, starts_with("hi"))
 
 
 def test_plugin_top_level_invalid():
@@ -62,27 +39,28 @@ def test_plugin_top_level_valid_empty_list():
     assert_that(TopLevel.valid([]), equal_to(True))
 
 
-def test_plugin_top_level_build_empty_list():
-    subject = TopLevel.build([])
-    assert_that(calling(next).with_args(subject), raises(StopIteration))
-
-
 def test_plugin_top_level_build_list_broken():
     subject = TopLevel.build([{}])
 
     from deployer.plugins.plugin import InvalidNode
-    assert_that(calling(next).with_args(subject), raises(InvalidNode))
+
+    for node in subject:
+        assert_that(calling(node.execute).with_args(None), raises(InvalidNode))
 
 
 def test_plugin_top_level_build_ordereddict_list_broken():
     subject = TopLevel.build([OrderedDict({'name': 'Testing'})])
 
     from deployer.plugins.plugin import InvalidNode
-    assert_that(calling(next).with_args(subject), raises(InvalidNode))
+
+    for node in subject:
+        assert_that(calling(node.execute).with_args(None), raises(InvalidNode))
 
 
 def test_plugin_top_level_build_errored_plugin():
     subject = TopLevel.build([OrderedDict({'name': 'Testing', 'env': {'a': 123}})])
 
     from deployer.plugins.plugin import FailedValidation
-    assert_that(calling(next).with_args(subject), raises(FailedValidation))
+
+    for node in subject:
+        assert_that(calling(node.execute).with_args(None), raises(FailedValidation))
