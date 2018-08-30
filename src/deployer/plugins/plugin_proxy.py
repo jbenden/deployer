@@ -26,8 +26,12 @@ import contextlib
 import logging
 import time
 
+import six
+
 from deployer.proxy import Proxy
 from deployer.rendering import BooleanExpression
+from deployer.rendering import my_safe_eval
+from deployer.rendering import render
 from deployer.result import Result
 
 LOGGER = logging.getLogger(__name__)
@@ -110,7 +114,11 @@ class PluginProxy(Proxy):
                 return Result(result='skipped')
 
         if self._with_items is not None:
-            for item in self._with_items:
+            if context and isinstance(self._with_items, six.string_types):
+                with_items = my_safe_eval(render(self._with_items, **context.variables.last()))
+            else:
+                with_items = self._with_items
+            for item in with_items:
                 with with_scoped_variables(context, item):
                     result = self._execute_one(context)
                     if not result:

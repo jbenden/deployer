@@ -69,3 +69,30 @@ def test_plugin_set_works(caplog):
         node.execute(context)
 
     assert_that(caplog.text, contains_string('| benden'))
+
+
+def test_plugin_set_list_with_items(caplog):
+    stream = StringIO('''
+    - name: test1
+      set:
+        bits:
+          - 1
+          - 2
+          - 3
+
+    - name: test2
+      echo: '--{{ item }}--'
+      with_items: "{{ bits }}"
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string('| --1--'))
+    assert_that(caplog.text, contains_string('| --2--'))
+    assert_that(caplog.text, contains_string('| --3--'))

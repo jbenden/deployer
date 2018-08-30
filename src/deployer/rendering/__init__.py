@@ -22,9 +22,12 @@ A recursive Jinja2 rendering engine.
 :license: Apache License 2.0, see LICENSE.txt for full details.
 """
 
+import ast
+import collections
 import logging
 import os
 import re
+import sys
 
 from jinja2 import Environment
 from jinja2.exceptions import TemplateSyntaxError
@@ -33,6 +36,75 @@ from jinja2.runtime import StrictUndefined
 from six import string_types
 
 LOGGER = logging.getLogger(__name__)
+
+# Based on: Using ast and whitelists to make python's eval() safe?
+# https://stackoverflow.com/questions/12523516/using-ast-and-whitelists-to-make-pythons-eval-safe
+
+SAFE_FX = {
+    'OrderedDict': collections.OrderedDict,
+}
+
+SAFE_NODES = set(
+    (
+        ast.Add,
+        ast.BinOp,
+        # ast.Call,
+        ast.Compare,
+        ast.Dict,
+        ast.Div,
+        ast.Expression,
+        ast.List,
+        ast.Load,
+        ast.Mult,
+        ast.Num,
+        ast.Name,
+        ast.Str,
+        ast.Sub,
+        ast.USub,
+        ast.Tuple,
+        ast.UnaryOp,
+    )
+)
+
+# AST node types were expanded after 2.6
+if sys.version_info[:2] >= (2, 7):  # noqa: no-cover
+    SAFE_NODES.update(
+        set(
+            (ast.Set,)
+        )
+    )
+
+# And in Python 3.4 too
+if sys.version_info[:2] >= (3, 4):  # noqa: no-cover
+    SAFE_NODES.update(
+        set(
+            (ast.NameConstant,)
+        )
+    )
+
+
+class CleansingNodeVisitor(ast.NodeVisitor):  # noqa: no-cover
+    """Cleaning AST node visitor."""
+
+    def generic_visit(self, node):
+        """All nodes, not matching another visitor."""
+        if type(node) not in SAFE_NODES:
+            raise Exception("%s not in SAFE_NODES" % type(node))
+        super(CleansingNodeVisitor, self).generic_visit(node)
+
+    def visit_Call(self, call):
+        """Call AST Node visitor."""
+        if call.func.id not in SAFE_FX:
+            raise Exception("Unknown function: %s" % call.func.id)
+
+
+def my_safe_eval(s):
+    """Safely evaluate a Pythonic expression string."""
+    tree = ast.parse(s, mode='eval')
+    cnv = CleansingNodeVisitor()
+    cnv.visit(tree)
+    compiled = compile(tree, s, "eval")
+    return(eval(compiled, SAFE_FX, dict({})))  # nosec
 
 
 class BooleanExpression:
