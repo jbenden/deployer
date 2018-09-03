@@ -14,7 +14,7 @@
 # limitations under the License.
 
 """
-The module plug-in providing the ``echo`` command.
+The module plug-in providing the ```echo``` command.
 
 .. moduleauthor:: Joseph Benden <joe@benden.us>
 
@@ -55,7 +55,7 @@ class Echo(Plugin):
 
     @staticmethod
     def build(node):
-        """Build an Echo node."""
+        """Build an `Echo` node."""
         yield Echo(node)
 
     def execute(self, context):
