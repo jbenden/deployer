@@ -64,7 +64,7 @@ class Matrix(PluginWithTasks):
     TAG = 'matrix'
 
     SCHEMA = {
-        'tags': Or([And(str, len)], {And(str, len): {And(str, len): And(str, len)}}),
+        'tags': Or([int, float, And(str, len)], {And(str, len): {And(str, len): And(str, len)}}),
     }
 
     def __init__(self, node):
