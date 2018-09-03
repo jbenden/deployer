@@ -28,7 +28,7 @@ class Result(dict):
 
     def __bool__(self):
         """Cast to boolean."""
-        return self['result'] != 'failure'
+        return self['result'] != 'failure' and self['result'] != 'continue'
 
     def __nonzero__(self):
         """Cast to boolean."""

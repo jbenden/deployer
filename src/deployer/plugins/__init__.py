@@ -24,6 +24,7 @@ from deployer.result import Result
 
 from .api import hookimpl
 from .command import Command
+from .cont import Continue
 from .echo import Echo
 from .env import Env
 from .matrix import Matrix
@@ -76,6 +77,7 @@ class Fail(Plugin):
 def deployer_register(registry):
     """Perform built-in plug-in registrations."""
     registry.register_plugin('command', Command)
+    registry.register_plugin('continue', Continue)
     registry.register_plugin('echo', Echo)
     registry.register_plugin('env', Env)
     registry.register_plugin('fail', Fail)

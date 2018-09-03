@@ -137,4 +137,7 @@ class Matrix(PluginWithTasks):
             if not result:
                 break
 
+        if result['result'] == 'continue':
+            result = Result(result='success')
+
         return result

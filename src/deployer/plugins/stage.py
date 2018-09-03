@@ -30,6 +30,7 @@ from schema import And
 from schema import Optional
 
 from deployer.plugins.plugin_with_tasks import PluginWithTasks
+from deployer.result import Result
 
 LOGGER = logging.getLogger(__name__)
 
@@ -82,5 +83,8 @@ class Stage(PluginWithTasks):
             LOGGER.debug('Beginning stage%s' % (' (with scope)' if self._scope else ''))
             result = self._execute_tasks(context)
             LOGGER.debug('Completed stage')
+
+        if result['result'] == 'continue':
+            result = Result(result='success')
 
         return result
