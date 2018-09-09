@@ -80,7 +80,7 @@ class PluginProxy(Proxy):
             # emit an end event here
 
             if not result and count < self._attempts:
-                LOGGER.warn("Task failed, will retry again. This is the %d time." % count)
+                LOGGER.warning("Task failed, will retry again. This is the %d time." % count)
                 time.sleep(count * count)
             else:
                 break
