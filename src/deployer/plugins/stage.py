@@ -84,7 +84,7 @@ class Stage(PluginWithTasks):
             result = self._execute_tasks(context)
             LOGGER.debug('Completed stage')
 
-        if result['result'] == 'continue':
+        if result['result'] in ['skipped', 'continue']:
             result = Result(result='success')
 
         return result
