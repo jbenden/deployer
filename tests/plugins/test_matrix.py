@@ -20,6 +20,7 @@ from hamcrest import contains_string
 from hamcrest import equal_to
 from hamcrest import has_entry
 from hamcrest import instance_of
+from hamcrest import is_not
 from six import StringIO
 
 from deployer import loader
@@ -218,3 +219,35 @@ def test_plugin_matrix_runs_with_two_matrices_and_contains_tags(caplog):
 
     assert_that(context.variables.last(), not has_entry('matrix_tag', 'm2'))
     assert_that(context.variables.last(), not has_entry('matrix_list', ['m2']))
+
+
+def test_plugin_matrix_runs_with_two_matrices_with_multiple_attempts(caplog):
+    stream = StringIO('''
+    - name: test1
+      matrix:
+        tags:
+          - m1
+          - m2
+        tasks:
+          - name: test2
+            matrix:
+              tags:
+                - m3
+              tasks:
+                - name: Testing task
+                  echo: Hello world.
+                  attempts: 3
+    ''')
+    document = loader.ordered_load(stream)
+
+    assert_that(TopLevel.valid(document), equal_to(True))
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string('Hello world.'))
+    assert_that(caplog.text, is_not(contains_string('failure')))
