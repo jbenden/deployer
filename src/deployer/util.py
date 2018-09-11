@@ -90,7 +90,7 @@ class FailureLoggingSubprocessProtocol(ProcessProtocol):
 
             # Display the entire log.
             for line in self.file:
-                LOGGER.warn("| %s" % line)
+                LOGGER.warning("| %s" % line)
 
             # Resolve the deferred.
             self.d.errback(reason)
@@ -137,7 +137,7 @@ class LoggingSubprocessProtocol(ProcessProtocol):
             LOGGER.info("| %s" % self.outBuf)
 
         if len(self.errBuf):  # noqa: no-cover
-            LOGGER.warn("! %s" % self.errBuf)
+            LOGGER.warning("! %s" % self.errBuf)
 
         if reason.check(ProcessDone):
             self.d.callback(''.join(self.capBuf))
