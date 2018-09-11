@@ -108,7 +108,7 @@ def test_plugin_shell_silent_failure_on_unix(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
       shell:
-        script: echo Hello && false
+        script: 'echo Hello >&2 && false'
         executable: bash
         silent: true
         timeout: 5.0
