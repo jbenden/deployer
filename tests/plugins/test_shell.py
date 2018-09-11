@@ -104,6 +104,29 @@ def test_plugin_shell_silent_on_unix(caplog, reactor):  # noqa: no-cover
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
+def test_plugin_shell_silent_failure_on_unix(caplog, reactor):  # noqa: no-cover
+    stream = StringIO('''
+    - name: test1
+      shell:
+        script: echo Hello && false
+        executable: bash
+        silent: true
+        timeout: 5.0
+    ''')
+    document = loader.ordered_load(stream)
+
+    nodes = TopLevel.build(document)
+
+    context = Context()
+
+    for node in nodes:
+        node.execute(context)
+
+    assert_that(caplog.text, contains_string('failure'))
+    assert_that(caplog.text, contains_string('| Hello'))
+
+
+@pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
 def test_plugin_shell_on_unix(caplog, reactor):  # noqa: no-cover
     stream = StringIO('''
     - name: test1
