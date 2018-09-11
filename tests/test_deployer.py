@@ -19,6 +19,7 @@ from click.testing import CliRunner
 from hamcrest import assert_that
 from hamcrest import contains_string
 from hamcrest import equal_to
+from hamcrest import is_not
 
 from deployer.cli import main
 
@@ -184,6 +185,20 @@ def test_exec_with_simple_matrix_tagging_example_multi_selected_matrix_tag():
     assert_that(result.exit_code, equal_to(0))
     assert_that(result.output, contains_string('Hello World.'))
     assert_that(result.output, contains_string('Hello Earth.'))
+
+
+def test_exec_with_simple_matrix_tagging_example_multi_non_selected_matrix_tag():
+    __path__ = os.path.dirname(__file__)
+    example = os.path.join(__path__, '..', 'examples', 'simple-matrix-tagging.yaml')
+
+    runner = CliRunner()
+    result = runner.invoke(main, ['--debug', 'exec', '--matrix-tags=a,*,*', example])
+
+    assert_that(result.exit_code, equal_to(0))
+    assert_that(result.output, is_not(contains_string('Hello World.')))
+    assert_that(result.output, contains_string('Hello Earth.'))
+    assert_that(result.output,
+                contains_string('Skipping because this matrix item does not have a user-selected matrix tag'))
 
 
 def test_exec_with_simple_matrix_tagging_example_not_selected_matrix_tag():
