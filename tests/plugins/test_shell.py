@@ -180,6 +180,7 @@ def test_plugin_shell_on_unix_nonzero_return_with_retries(caplog, reactor):  # n
         node.execute(context)
 
     assert_that(caplog.text, contains_string("'failure'"))
+    assert_that(caplog.text, contains_string("Task failed all retry attempts"))
 
 
 @pytest.mark.skipif(IS_WINDOWS, reason='Irrelevant on non-unix')
