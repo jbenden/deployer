@@ -39,6 +39,28 @@ Local+CI+CD Made Easy!
 
 * Free software: Apache Software License 2.0
 
+Features
+========
+
+- Project strives for pipelines being similar in spirit to Ansible playbooks/roles.
+- A wide range of Python versions are supported: 2.7, 3.4, 3.5, 3.6, 3.7, PyPy, and PyPy3.
+- Automatic schema validation; however, Jinja templating is not validated until run-time of the pipeline.
+- Pipeline stages (named group of tasks), including arbitrarily nested ones.
+- Matrix driven pipelines, including arbitrarily nested ones.
+- Command and Shell script execution; supporting inline, templated inline, and/or external tools.
+
+  - Support for Bourne, Bash, CMD.EXE, and PowerShell 2.x or newer.
+  - Support for automatic retry, on failures.
+  - Support for silent output, unless Command/Shell fails.
+
+- Support for conditional task execution.
+- Environment variables.
+- Template variables.
+- Filter execution of tags and/or Matrix tags.
+- Support for recursive Jinj2 templating.
+- All execution times are tracked and reported; at all possible nested levels of the running pipeline.
+- Support for various logging levels
+
 Installation
 ============
 
