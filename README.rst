@@ -43,6 +43,7 @@ Features
 ========
 
 - Project strives for pipelines being similar in spirit to Ansible playbooks/roles.
+- Supports for both POSIX and Windows operating systems.
 - A wide range of Python versions are supported: 2.7, 3.4, 3.5, 3.6, 3.7, PyPy, and PyPy3.
 - Automatic schema validation; however, Jinja templating is not validated until run-time of the pipeline.
 - Pipeline stages (named group of tasks), including arbitrarily nested ones.
